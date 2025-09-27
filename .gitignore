@@ -1,2 +1,3 @@
-Objects/
-!Project.hex
+
+#!Objects/Project.hex
+Objects/*.*
