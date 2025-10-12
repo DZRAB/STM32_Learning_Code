@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F10X_MD</Define>
               <Undefine></Undefine>
-              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\delay;.\Basic\rtc;.\Basic\sys;.\Basic\usart</IncludePath>
+              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\delay;.\Basic\rtc;.\Basic\sys;.\Basic\usart;.\Hardware\LED</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -564,6 +564,13 @@
         </Group>
         <Group>
           <GroupName>Hardware</GroupName>
+          <Files>
+            <File>
+              <FileName>LED.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\LED\LED.c</FilePath>
+            </File>
+          </Files>
         </Group>
       </Groups>
     </Target>
