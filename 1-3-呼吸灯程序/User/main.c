@@ -1,8 +1,8 @@
 /*********************************************************************************************
 模板制作：  杜洋工作室/洋桃电子
-程序名：	
-编写人：		
-编写时间：	201年月日
+程序名：	LED呼吸灯程序
+编写人：	杜洋	
+编写时间：	2017年12月25日
 硬件支持：	STM32F103C8   外部晶振8MHz RCC函数设置主频72MHz　  
 
 修改日志：　　
@@ -21,34 +21,43 @@
 
 
 int main (void){//主程序
+	//定义需要的变量
+	u8 MENU;
+	u16 t,i;
+	//初始化程序
 	RCC_Configuration(); //时钟设置
 	LED_Init();
+	//设置变量的初始值
+	MENU = 0;
+	t = 1;
+	//主循环
 	while(1){
-		
-		//方法1：
-		GPIO_WriteBit(LEDPORT,LED1 ,(BitAction)(1)); //LED1接口输出高电平1
-		GPIO_WriteBit(LEDPORT,LED2 ,(BitAction)(0)); //LED1接口输出高电平1
-		delay_us(100000); //延时
-		GPIO_WriteBit(LEDPORT,LED1 ,(BitAction)(0)); //LED1接口输出低电平0
-		GPIO_WriteBit(LEDPORT,LED2 ,(BitAction)(1)); //LED1接口输出低电平0
-		delay_us(100000); //延时
-		
-		//方法2：
-//		GPIO_WriteBit(LEDPORT,LED1,(BitAction)(1-GPIO_ReadOutputDataBit(LEDPORT,LED1))); //取反LED1
-//		delay_ms(500); //延时
-
-		//方法3：
-//		GPIO_SetBits(LEDPORT,LED1); //LED灯都为高电平（1）
-//		delay_s(1); //延时1秒
-//		GPIO_ResetBits(LEDPORT,LED1); //LED灯都为低电平（0）
-//		delay_s(1); //延时1秒
-
-		//方法4
-//		GPIO_Write(LEDPORT,0x0001); //直接数值操作将变量值写入LED
-//		delay_s(2); //延时1秒
-//		GPIO_Write(LEDPORT,0x0000); //直接数值操作将变量值写入LED
-//		delay_s(1); //延时1秒
-
+		//菜单0
+		if(MENU == 0){ //变亮循环
+			for(i = 0; i < 10; i++){
+				GPIO_WriteBit(LEDPORT,LED1,(BitAction)(1)); //LED1接口输出高电平1
+				delay_us(t); //延时
+				GPIO_WriteBit(LEDPORT,LED1,(BitAction)(0)); //LED1接口输出低电平0
+				delay_us(501-t); //延时
+			}
+			t++;
+			if(t==500){
+				MENU = 1;
+			}
+		}
+		//菜单1
+		if(MENU == 1){ //变暗循环
+			for(i = 0; i < 10; i++){
+				GPIO_WriteBit(LEDPORT,LED1,(BitAction)(1)); //LED1接口输出高电平1
+				delay_us(t); //延时
+				GPIO_WriteBit(LEDPORT,LED1,(BitAction)(0)); //LED1接口输出低电平0
+				delay_us(501-t); //延时
+			}
+			t--;
+			if(t==1){
+				MENU = 0;
+			}
+		}		
 	}
 }
 
