@@ -1,7 +1,7 @@
 /*********************************************************************************************
 
 硬件支持：	STM32F103C8   外部晶振8MHz RCC函数设置主频72MHz　  
-						
+	
 说明：
  # 本模板加载了STM32F103内部的RCC时钟设置，并加入了利用滴答定时器的延时函数。
  # 可根据自己的需要增加或删减。
@@ -12,45 +12,53 @@
 #include "delay.h"
 #include "led.h"
 
+#include "key.h" 
 
 int main (void){//主程序
-	//定义需要的变量
-	u8 MENU;
-	u16 t,i;
+	u8 a; //定义变量
 	//初始化程序
 	RCC_Configuration(); //时钟设置
-	LED_Init();
-	//设置变量的初始值
-	MENU = 0;
-	t = 1;
+	LED_Init();//LED初始化
+
+	KEY_Init();//按键初始化
+
 	//主循环
 	while(1){
-		//菜单0
-		if(MENU == 0){ //变亮循环
-			for(i = 0; i < 5; i++){
-				GPIO_WriteBit(LEDPORT,LED1,(BitAction)(1)); //LED1接口输出高电平1
-				delay_us(t); //延时
-				GPIO_WriteBit(LEDPORT,LED1,(BitAction)(0)); //LED1接口输出低电平0
-				delay_us(501-t); //延时
-			}
-			t++;
-			if(t==500){
-				MENU = 1;
-			}
+
+		//示例1：无锁存
+		if(GPIO_ReadInputDataBit(KEYPORT,KEY1)){ //读按键接口的电平
+			GPIO_ResetBits(LEDPORT,LED1); //LED灯都为低电平（0） 
+		}else{	
+			GPIO_SetBits(LEDPORT,LED1); //LED灯都为高电平（1） 
 		}
-		//菜单1
-		if(MENU == 1){ //变暗循环
-			for(i = 0; i < 5; i++){
-				GPIO_WriteBit(LEDPORT,LED1,(BitAction)(1)); //LED1接口输出高电平1
-				delay_us(t); //延时
-				GPIO_WriteBit(LEDPORT,LED1,(BitAction)(0)); //LED1接口输出低电平0
-				delay_us(501-t); //延时
-			}
-			t--;
-			if(t==1){
-				MENU = 0;
-			}
-		}		
+
+		//示例2：无锁存
+//		GPIO_WriteBit(LEDPORT,LED1,(BitAction)(!GPIO_ReadInputDataBit(KEYPORT,KEY1))); 
+
+		//示例3：有锁存
+//		if(!GPIO_ReadInputDataBit(KEYPORT,KEY1)){ //读按键接口的电平
+//			delay_ms(20); //延时去抖动
+//			if(!GPIO_ReadInputDataBit(KEYPORT,KEY1)){ //读按键接口的电平
+//				GPIO_WriteBit(LEDPORT,LED1,(BitAction)(1-GPIO_ReadOutputDataBit(LEDPORT,LED1))); //LED取反
+//				while(!GPIO_ReadInputDataBit(KEYPORT,KEY1)); //等待按键松开 
+//			}
+//		}
+
+		//示例4：有锁存
+//		if(!GPIO_ReadInputDataBit(KEYPORT,KEY1)){ //读按键接口的电平
+//			delay_ms(20); //延时20ms去抖动
+//			if(!GPIO_ReadInputDataBit(KEYPORT,KEY1)){ //读按键接口的电平
+//				//在2个LED上显示二进制加法
+//				a++; //变量加1
+//				if(a>3){ //当变量大于3时清0
+//					a=0; 
+//				}
+//				GPIO_Write(LEDPORT,a); //直接数值操作将变量值写入LED（LED在GPIOB组的PB0和PB1上）
+//				while(!GPIO_ReadInputDataBit(KEYPORT,KEY1)); //等待按键松开 
+//			}
+//		}
+
+
 	}
 }
 
