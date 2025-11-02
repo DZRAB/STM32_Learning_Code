@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F10X_MD</Define>
               <Undefine></Undefine>
-              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\delay;.\Basic\rtc;.\Basic\sys;.\Basic\usart;.\Hardware\LED;.\Hardware\KEY;.\Basic\flash;.\Hardware\BUZZER;.\Hardware\TOUCH_KEY;.\Hardware\TM1640</IncludePath>
+              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\delay;.\Basic\rtc;.\Basic\sys;.\Basic\usart;.\Hardware\LED;.\Hardware\KEY;.\Basic\flash;.\Hardware\BUZZER;.\Hardware\TOUCH_KEY;.\Hardware\TM1640;.\Hardware\LM75A;.\Basic\i2c</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -565,6 +565,11 @@
               <FileType>1</FileType>
               <FilePath>.\Basic\flash\flash.c</FilePath>
             </File>
+            <File>
+              <FileName>i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Basic\i2c\i2c.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -594,6 +599,11 @@
               <FileName>TM1640.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Hardware\TM1640\TM1640.c</FilePath>
+            </File>
+            <File>
+              <FileName>lm75a.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\LM75A\lm75a.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -1,0 +1,7 @@
+{
+    "editor.fontSize": 16,
+    "files.associations": {
+        "rtc.h": "c",
+        "sys.h": "c"
+    }
+}
