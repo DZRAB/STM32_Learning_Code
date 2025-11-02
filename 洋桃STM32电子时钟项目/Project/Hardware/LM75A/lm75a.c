@@ -84,8 +84,8 @@ void LM75A_GetTemp(u8 *Tempbuffer)
 // LM75进入掉电模式，再次调用LM75A_GetTemp();即可正常工作
 // 建议只在需要低功耗情况下使用
 void LM75A_POWERDOWN(void)
-{									   //
-	I2C_SAND_BYTE(LM75A_ADD, 0x01, 1); //
+{									 
+	I2C_SAND_BYTE(LM75A_ADD, 0x01, 1); 
 }
 
 /*********************************************************************************************

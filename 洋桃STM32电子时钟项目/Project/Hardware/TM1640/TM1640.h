@@ -10,9 +10,9 @@
 
 
 void TM1640_Init(void);//初始化
-void TM1640_led(u8 date);//
-void TM1640_display(u8 address,u8 date);//
-void TM1640_display_add(u8 address,u8 date);//
+void TM1640_led(u8 date);//固定地址模式的显示输出8个LED控制
+void TM1640_display(u8 address,u8 date);//固定地址模式的显示输出
+void TM1640_display_add(u8 address,u8 date);//地址自动加一模式的显示输出
 
 		 				    
 #endif

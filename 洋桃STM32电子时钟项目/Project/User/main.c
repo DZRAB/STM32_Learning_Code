@@ -5,6 +5,8 @@
 
 修改日志	：
 1-2025年11月2日12:07:32 创建工程，模板复制：1-17-数码管RTC显示程序
+2-2025年11月2日21:07:56 增加按键选择功能
+
 
 说明：
  # 本模板加载了STM32F103内部的RCC时钟设置，并加入了利用滴答定时器的延时函数。
@@ -18,31 +20,61 @@
 #include "TM1640.h"
 #include "lm75a.h"
 #include "i2c.h"
+#include "touch_key.h"
 
-
-int main(void)// 主程序
-{ 
-	u8 temp[3];
+int main(void) // 主程序
+{
+	u8 MENU;			 // 菜单
+	u8 temp[3];			 // 温度
 	RCC_Configuration(); // 系统时钟初始化
 	RTC_Config();		 // RTC初始化
-	I2C_Configuration();
+	I2C_Configuration(); // I2C初始化
 	TM1640_Init();		 // TM1640初始化
+	TM1640_led(0x00); //熄灭8个led
+	TOUCH_KEY_Init(); //触摸按键初始化
+
 	while (1)
 	{
+
+		if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A))// 读触摸按键的电平
+		{
+			while(!GPIO_ReadInputDataBit(TOUCH_KEYPORT,TOUCH_KEY_A));
+			MENU = 0;
+		}
 		
-		if (RTC_Get() == 0)
-		{				
+		if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B))// 读触摸按键的电平
+		{
+			while(!GPIO_ReadInputDataBit(TOUCH_KEYPORT,TOUCH_KEY_B));
+			MENU = 1;	
+		}
+			
+		if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C))// 读触摸按键的电平
+		{
+			while(!GPIO_ReadInputDataBit(TOUCH_KEYPORT,TOUCH_KEY_C));
+			MENU = 2;
+		}
+		
+		if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D))// 读触摸按键的电平
+		{
+			while(!GPIO_ReadInputDataBit(TOUCH_KEYPORT,TOUCH_KEY_D));
+	 
+		}
+			
+		
+		RTC_Get();
+		if (MENU == 0) // 年月日
+		{
 			TM1640_display(0, ryear % 100 / 10); // 年
 			TM1640_display(1, ryear % 100 % 10);
-			TM1640_display(2, 21); //-
-			TM1640_display(3, rmon / 10);  // 月
+			TM1640_display(2, 21);		  //-
+			TM1640_display(3, rmon / 10); // 月
 			TM1640_display(4, rmon % 10);
-			TM1640_display(5, 21); //-
-			TM1640_display(6, rday / 10);  // 日
+			TM1640_display(5, 21);		  //-
+			TM1640_display(6, rday / 10); // 日
 			TM1640_display(7, rday % 10);
-
-			delay_ms(1000); // 延时
-
+		}
+		if (MENU == 1) // 时分秒
+		{
 			TM1640_display(0, 20); // 空
 			TM1640_display(1, 20);
 			TM1640_display(2, rhour / 10); // 时
@@ -51,26 +83,21 @@ int main(void)// 主程序
 			TM1640_display(5, rmin % 10 + 10);
 			TM1640_display(6, rsec / 10); // 秒
 			TM1640_display(7, rsec % 10);
-
-			delay_ms(1000); // 延时
-
+		}
+		if (MENU == 2) // 显示温度
+		{
 			LM75A_GetTemp(temp);
 			TM1640_display(0, 20); // 空
 			TM1640_display(1, 20);
-			if(temp[0] == 0) //判断温度正负
-			{
-				TM1640_display(2, 20);//不显示符号
-			}else
-			{
-				TM1640_display(2, 21);//显示-符号
-			}
-			TM1640_display(3, temp[1] % 100 / 10); 
-			TM1640_display(4, temp[1] % 10 + 10);  // 温度
+			if (temp[0] == 0) // 判断温度正负
+				TM1640_display(2, 20); // 不显示符号
+			else
+				TM1640_display(2, 21); // 显示-符号
+			TM1640_display(3, temp[1] % 100 / 10);
+			TM1640_display(4, temp[1] % 10 + 10); // 温度
 			TM1640_display(5, temp[2] % 100 / 10);
 			TM1640_display(6, temp[2] % 10);
 			TM1640_display(7, 22); //'C'
-
-			delay_ms(1000); // 延时
 		}
 	}
 }

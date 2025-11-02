@@ -2,6 +2,9 @@
     "editor.fontSize": 16,
     "files.associations": {
         "rtc.h": "c",
-        "sys.h": "c"
+        "sys.h": "c",
+        "touch_key.h": "c",
+        "lm75a.h": "c",
+        "tm1640.h": "c"
     }
 }
