@@ -39,8 +39,8 @@
 #include "rtc.h"
 
 // 以下2条全局变量--用于RTC时间的读取
-u16 ryear;								 // 4位年
-u8 rmon, rday, rhour, rmin, rsec, rweek; // 2位月日时分秒周
+u16 ryear=0;								 // 4位年
+u8 rmon=0, rday=0, rhour=0, rmin=0, rsec=0, rweek=0; // 2位月日时分秒周
 
 void RTC_First_Config(void)
 {																			 // 首次启用RTC的设置
