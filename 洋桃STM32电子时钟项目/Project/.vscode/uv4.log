@@ -1,8 +1,4 @@
-*** Using Compiler 'V5.06 update 5 (build 528)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
+*** Using Compiler 'V5.06 update 5 (build 528)', folder: 'D:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Target 1'
-compiling main.c...
-linking...
-Program Size: Code=6140 RO-data=312 RW-data=40 ZI-data=1832  
-FromELF: creating hex file...
 ".\Objects\Project.axf" - 0 Error(s), 0 Warning(s).
 Build Time Elapsed:  00:00:01
