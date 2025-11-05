@@ -5,6 +5,7 @@
         "sys.h": "c",
         "touch_key.h": "c",
         "lm75a.h": "c",
-        "tm1640.h": "c"
+        "tm1640.h": "c",
+        "delay.h": "c"
     }
 }

@@ -3,15 +3,7 @@
 #include "sys.h" 
 
 
-//全局变量的声明，在rtc.c文件中定义
-//以下2条是使用extern语句声明全局变量
-//注意：这里不能给变量赋值
-extern u16 ryear;
-extern u8 rmon,rday,rhour,rmin,rsec,rweek;
-
-
-
-u8 RTC_Get(void);//读出当前时间值	
+u8 RTC_Get(u16 *ryear,u8 *rmon,u8 *rday,u8 *rhour,u8 *rmin,u8 *rsec,u8 *rweek);//读出当前时间值 //返回值:0,成功;其他:错误代码.	
 void RTC_First_Config(void);//首次启用RTC的设置
 void RTC_Config(void);//实时时钟初始化
 u8 Is_Leap_Year(u16 year);//判断是否是闰年函数                    
