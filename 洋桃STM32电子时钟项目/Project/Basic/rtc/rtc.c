@@ -135,7 +135,7 @@ const u8 mon_table[12]={31,28,31,30,31,30,31,31,30,31,30,31};//平年的月份日期表
 u8 RTC_Set(u16 syear,u8 smon,u8 sday,u8 hour,u8 min,u8 sec){ //写入当前时间（1970~2099年有效），
 	u16 t;
 	u32 seccount=0;
-	if(syear<2000||syear>2099)return 1;//syear范围1970-2099，此处设置范围为2000-2099       
+	if(syear<1970||syear>2099)return 1;//syear范围1970-2099       
 	for(t=1970;t<syear;t++){ //把所有年份的秒钟相加
 		if(Is_Leap_Year(t))seccount+=31622400;//闰年的秒钟数
 		else seccount+=31536000;                    //平年的秒钟数
@@ -149,8 +149,8 @@ u8 RTC_Set(u16 syear,u8 smon,u8 sday,u8 hour,u8 min,u8 sec){ //写入当前时间（197
 	seccount+=(u32)hour*3600;//小时秒钟数
 	seccount+=(u32)min*60;      //分钟秒钟数
 	seccount+=sec;//最后的秒钟加上去
-	//RTC_First_Config(); //重新初始化时钟
-	//BKP_WriteBackupRegister(BKP_DR1, 0xA5A5);//配置完成后，向后备寄存器中写特殊字符0xA5A5
+	RTC_First_Config(); //重新初始化时钟
+	BKP_WriteBackupRegister(BKP_DR1, 0xA5A5);//配置完成后，向后备寄存器中写特殊字符0xA5A5
 	RTC_SetCounter(seccount);//把换算好的计数器值写入
 	RTC_WaitForLastTask(); //等待写入完成
 	return 0; //返回值:0,成功;其他:错误代码.    

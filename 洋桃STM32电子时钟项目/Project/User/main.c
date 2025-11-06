@@ -26,20 +26,42 @@ int main(void) // 主程序
 {
 	u8 MENU = 0; // 菜单
 	u8 temp[3];	 // 温度
-	u16 i;
+	u16 i, a, c, t = 0;
+	u8 rup = 0; // 时间更新标志位
 	// 以下2条局部变量--用于RTC时间的读取
-	u16 ryear = 1970;								 // 4位年
+	u16 ryear = 1970;												 // 4位年
 	u8 rmon = 1, rday = 1, rhour = 1, rmin = 1, rsec = 1, rweek = 0; // 2位月日时分秒周
-	RCC_Configuration();					 // 系统时钟初始化
-	RTC_Config();							 // RTC初始化
-	I2C_Configuration();					 // I2C初始化
-	TM1640_Init();							 // TM1640初始化
-	TM1640_led(0x00);						 // 熄灭8个led
-	TOUCH_KEY_Init();						 // 触摸按键初始化
+	delay_ms(200);
+	RCC_Configuration(); // 系统时钟初始化
+	RTC_Config();		 // RTC初始化
+	I2C_Configuration(); // I2C初始化
+	TM1640_Init();		 // TM1640初始化
+	TM1640_led(0x00);	 // 熄灭8个led
+	TOUCH_KEY_Init();	 // 触摸按键初始化
 
 	while (1)
 	{
-		RTC_Get(&ryear, &rmon, &rday, &rhour, &rmin, &rsec, &rweek);
+		if (rup == 1)
+		{
+			rup = 0;
+			RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+		}
+		if (MENU < 2 || MENU > 8)
+		{
+			RTC_Get(&ryear, &rmon, &rday, &rhour, &rmin, &rsec, &rweek); // 读出RTC时间
+			LM75A_GetTemp(temp);
+		}
+		// 循环显示
+		if (MENU < 3 && t == 1)
+			MENU = 0;
+		if (MENU < 3 && t == 1000)
+			MENU = 2;
+		if (MENU < 3 && t == 2000)
+			MENU = 1;
+		if (MENU < 3 && t > 8000)
+			t = 0;
+		t++;
+
 		if (MENU == 0) // 显示年月日
 		{
 			TM1640_display(0, ryear % 100 / 10); // 年
@@ -118,7 +140,7 @@ int main(void) // 主程序
 		}
 		if (MENU == 2) // 显示温度
 		{
-			LM75A_GetTemp(temp);
+
 			TM1640_display(0, 20); // 空
 			TM1640_display(1, 20);
 			if (temp[0] == 0)		   // 判断温度正负
@@ -171,6 +193,7 @@ int main(void) // 主程序
 			delay_ms(500);
 			MENU = 4;
 		}
+
 		if (MENU == 4) // 设置年
 		{
 			i++;
@@ -194,26 +217,55 @@ int main(void) // 主程序
 			TM1640_display(6, rday / 10); // 日
 			TM1640_display(7, rday % 10);
 
-			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A)) // 读触摸按键的电平
-			{
-				ryear++;
-				if (ryear > 2099)
-				{
-					ryear = 2000;
+			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A))
+			{ // 判断长短键
+				while ((!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A)) && c < 100)
+				{ // 循环判断长按，到时跳转
+					c++;
+					delay_ms(10); // 长按判断的计时
 				}
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
-				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A))
-					;
+				if (c >= 100)
+				{ // 长键处理
+					// 长按后执行的程序放到此处
+					while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A))
+					{
+						i = 301; // 关闭数字闪烁
+						ryear++;
+						if (ryear > 2099)
+						{
+							ryear = 1970;
+						}
+						TM1640_display(0, ryear % 100 / 10); // 年
+						TM1640_display(1, ryear % 100 % 10);
+						delay_ms(100);
+					}
+				}
+				else
+				{ // 单击处理
+					if (a == 0)
+					{ // 判断单击
+						// 单击后执行的程序放到此处
+						i = 301; // 关闭数字闪烁
+						ryear++;
+						if (ryear > 2099)
+						{
+							ryear = 1970;
+						}
+					}
+				}
+				a = 0;
+				c = 0; // 参数清0
 			}
 
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B)) // 读触摸按键的电平
 			{
+				i = 301; // 关闭数字闪烁
 				ryear--;
-				if (ryear < 2000)
+				if (ryear < 1970)
 				{
 					ryear = 2099;
 				}
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B))
 					;
 			}
@@ -223,7 +275,7 @@ int main(void) // 主程序
 
 				MENU = 5;
 				TM1640_led(0x00);
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C))
 					;
 			}
@@ -233,14 +285,14 @@ int main(void) // 主程序
 
 				MENU = 0;
 				TM1640_led(0xff);
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+				rup = 1;
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D))
 					;
 			}
 		}
 		if (MENU == 5) // 设置月
 		{
-			
+
 			i++;
 			TM1640_display(0, ryear % 100 / 10); // 年
 			TM1640_display(1, ryear % 100 % 10);
@@ -264,24 +316,26 @@ int main(void) // 主程序
 
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A)) // 读触摸按键的电平
 			{
+				i = 301; // 关闭数字闪烁
 				rmon++;
 				if (rmon > 12)
 				{
 					rmon = 1;
 				}
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A))
 					;
 			}
 
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B)) // 读触摸按键的电平
 			{
+				i = 301; // 关闭数字闪烁
 				rmon--;
 				if (rmon < 1)
 				{
 					rmon = 12;
 				}
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B))
 					;
 			}
@@ -290,7 +344,7 @@ int main(void) // 主程序
 			{
 				MENU = 6;
 				TM1640_led(0x00);
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C))
 					;
 			}
@@ -300,7 +354,7 @@ int main(void) // 主程序
 
 				MENU = 0;
 				TM1640_led(0xff);
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+				rup = 1;
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D))
 					;
 			}
@@ -329,12 +383,12 @@ int main(void) // 主程序
 
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A)) // 读触摸按键的电平
 			{
+				i = 301; // 关闭数字闪烁
 				rday++;
 				if (rday > 31)
 				{
 					rday = 1;
 				}
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
 
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A))
 					;
@@ -342,12 +396,12 @@ int main(void) // 主程序
 
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B)) // 读触摸按键的电平
 			{
+				i = 301; // 关闭数字闪烁
 				rday--;
 				if (rday < 1)
 				{
 					rday = 31;
 				}
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
 
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B))
 					;
@@ -355,9 +409,10 @@ int main(void) // 主程序
 
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C)) // 读触摸按键的电平
 			{
+
 				MENU = 7;
 				TM1640_led(0x00);
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C))
 					;
 			}
@@ -367,11 +422,12 @@ int main(void) // 主程序
 
 				MENU = 0;
 				TM1640_led(0xff);
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+				rup = 1;
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D))
 					;
 			}
 		}
+
 		if (MENU == 7) // 设置小时
 		{
 			i++;
@@ -397,25 +453,29 @@ int main(void) // 主程序
 
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A)) // 读触摸按键的电平
 			{
+				i = 301; // 关闭数字闪烁
 				rhour++;
 				if (rhour > 23)
 				{
 					rhour = 0;
 				}
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A))
 					;
 			}
 
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B)) // 读触摸按键的电平
 			{
-
+				i = 301; // 关闭数字闪烁
 				if (rhour == 0)
 				{
-					rhour = 24;
+					rhour = 23;
 				}
-				rhour--;
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+				else
+				{
+					rhour--;
+				}
+
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B))
 					;
 			}
@@ -424,7 +484,7 @@ int main(void) // 主程序
 			{
 				MENU = 8;
 				TM1640_led(0x00);
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C))
 					;
 			}
@@ -433,7 +493,7 @@ int main(void) // 主程序
 			{
 				MENU = 1;
 				TM1640_led(0xff);
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+				rup = 1;
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D))
 					;
 			}
@@ -463,13 +523,14 @@ int main(void) // 主程序
 
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A)) // 读触摸按键的电平
 			{
+				i = 301; // 关闭数字闪烁
 				rmin++;
 				if (rmin > 59)
 				{
 					rmin = 0;
 				}
 				rsec = 0;
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A))
 					;
 			}
@@ -477,13 +538,17 @@ int main(void) // 主程序
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B)) // 读触摸按键的电平
 			{
 
+				i = 301; // 关闭数字闪烁
 				if (rmin == 0)
 				{
-					rmin = 60;
+					rmin = 59;
 				}
-				rmin--;
+				else
+				{
+					rmin--;
+				}
 				rsec = 0;
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B))
 					;
 			}
@@ -492,7 +557,7 @@ int main(void) // 主程序
 			{
 				MENU = 4;
 				TM1640_led(0x00);
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C))
 					;
 			}
@@ -502,7 +567,7 @@ int main(void) // 主程序
 				rsec = 0;
 				MENU = 1;
 				TM1640_led(0xff);
-				RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
+				rup = 1;
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D))
 					;
 			}
