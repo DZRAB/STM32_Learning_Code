@@ -135,7 +135,7 @@ const u8 mon_table[12]={31,28,31,30,31,30,31,31,30,31,30,31};//平年的月份日期表
 u8 RTC_Set(u16 syear,u8 smon,u8 sday,u8 hour,u8 min,u8 sec){ //写入当前时间（1970~2099年有效），
 	u16 t;
 	u32 seccount=0;
-	if(syear<1970||syear>2099)return 1;//syear范围1970-2099       
+	if(syear<2000||syear>2099)return 1;//syear范围1970-2099       
 	for(t=1970;t<syear;t++){ //把所有年份的秒钟相加
 		if(Is_Leap_Year(t))seccount+=31622400;//闰年的秒钟数
 		else seccount+=31536000;                    //平年的秒钟数

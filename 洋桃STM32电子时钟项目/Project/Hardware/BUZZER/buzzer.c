@@ -140,16 +140,69 @@ void BUZZER_BEEP1(void){ //蜂鸣器响一声
 		delay_us(500); //延时		
 	}
 }
-void BUZZER_BEEP2(void){ //蜂鸣器响一声
+void BUZZER_BOOT_BEEP(void){ //开机音
 	u16 i;
-	for(i=0;i<200;i++){
+	for(i=0;i<400;i++){
 		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(0)); //蜂鸣器接口输出0
-		delay_us(700); //延时		
+		delay_us(500); //延时		
 		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(1)); //蜂鸣器接口输出高电平1
-		delay_us(700); //延时		
+		delay_us(500); //延时		
 	}
 }
 
+void BUZZER_KEY_BEEP(void){ //按键音
+	u16 i;
+	for(i=0;i<50;i++){
+		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(0)); //蜂鸣器接口输出0
+		delay_us(500); //延时		
+		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(1)); //蜂鸣器接口输出高电平1
+		delay_us(500); //延时		
+	}
+}
+
+void BUZZER_SET_BEEP(void){ //SET音
+	u16 i;
+	for(i=0;i<150;i++){
+		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(0)); //蜂鸣器接口输出0
+		delay_us(300); //延时		
+		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(1)); //蜂鸣器接口输出高电平1
+		delay_us(300); //延时		
+	}
+  for(i=0;i<150;i++){
+		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(0)); //蜂鸣器接口输出0
+		delay_us(200); //延时		
+		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(1)); //蜂鸣器接口输出高电平1
+		delay_us(200); //延时		
+	}
+  for(i=0;i<150;i++){
+		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(0)); //蜂鸣器接口输出0
+		delay_us(100); //延时		
+		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(1)); //蜂鸣器接口输出高电平1
+		delay_us(100); //延时		
+	}
+}
+
+void BUZZER_QUIT_SET_BEEP(void){ //退出SET音
+	u16 i;
+	for(i=0;i<150;i++){
+		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(0)); //蜂鸣器接口输出0
+		delay_us(100); //延时		
+		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(1)); //蜂鸣器接口输出高电平1
+		delay_us(100); //延时		
+	}
+  for(i=0;i<150;i++){
+		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(0)); //蜂鸣器接口输出0
+		delay_us(200); //延时		
+		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(1)); //蜂鸣器接口输出高电平1
+		delay_us(200); //延时		
+	}
+  for(i=0;i<150;i++){
+		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(0)); //蜂鸣器接口输出0
+		delay_us(100); //延时		
+		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(1)); //蜂鸣器接口输出高电平1
+		delay_us(100); //延时		
+	}
+}
 
 void MIDI_PLAY(void){ //MIDI音乐
 	  u16 i=0;
