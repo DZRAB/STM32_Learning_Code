@@ -6,6 +6,8 @@
 修改日志	：
 1-2025年11月2日12:07:32 创建工程，模板复制：1-17-数码管RTC显示程序
 2-2025年11月2日21:07:56 增加按键选择功能
+3-2025年11月8日 实现了闹钟选项功能
+4-2025年11月9日 对程序进行了备注
 
 
 说明：
@@ -22,19 +24,21 @@
 #include "i2c.h"
 #include "touch_key.h"
 #include "buzzer.h"
+#include "flash.h"
 
 int main(void) // 主程序
 {
-	u8 MENU = 0; // 菜单
-	u8 temp[3];	 // 温度
-	u16 i, c, t = 0;
-	u8 rup = 0;	  // 时间更新标志位
-	u8 MENU2 = 0; // 菜单2,增加闹钟功能
+	u8 MENU = 0;   // 菜单
+	u8 temp[3];	   // 温度
+	u16 i = 0;	   // 通用变量
+	u8 c = 0;	   // 判断按键长按的计数
+	u16 t = 0;	   // 循环时间计数变量
+	u8 rup = 0;	   // 时间设置标志位
+	u8 MENU2 = 0;  // 菜单2,增加闹钟功能,0是设置时间,1-8是设置闹钟
+	u8 alFlag = 0; // 闹钟标志位
 	// 以下2条局部变量--用于RTC时间的读取
-	u16 ryear = 1970;												 // 4位年
-	u8 rmon = 1, rday = 1, rhour = 1, rmin = 1, rsec = 1, rweek = 0; // 2位月日时分秒周
-	u8 alhour[8];													 // 设置每个闹钟的小时，一共8个
-	u8 almin[8];													 // 设置每个闹钟的分钟，一共8个
+	u16 ryear = 2025;												 // 4位年
+	u8 rmon = 1, rday = 1, rhour = 1, rmin = 1, rsec = 1, rweek = 0; // 2位月日时分秒周													 // 闹钟标志为
 	delay_ms(200);
 	RCC_Configuration(); // 系统时钟初始化
 	RTC_Config();		 // RTC初始化
@@ -45,46 +49,85 @@ int main(void) // 主程序
 	BUZZER_Init();
 	BUZZER_BOOT_BEEP();
 
-	while (1)
+	for (i = 0; i < 8; i++) // 从flash读出闹钟数据
 	{
-		if (rup == 1)
+		t = FLASH_R(FLASH_START_ADDR + i * 2); // 从指定页的地址读FLASH，因为是16位，每次读2个字节,读数据的偏移量每次是2
+		alhour[i] = (t >> 8) & 0xff;		   // 高八位是小时
+		almin[i] = t & 0xff;				   // 低八位是分钟
+		if (alhour[i] > 24 || almin[i] > 59)   // 判断flash是否首次使用，是则清零
+		{
+			alhour[i] = 24; // 初始化为24，默认闹钟关
+			almin[i] = 0;
+			ALFlash_W();
+		}
+	}
+
+	while (1) // 主循环
+	{
+		if (rup == 1) // 设置时间标志位，时间设置好后把时间写入flash
 		{
 			BUZZER_QUIT_SET_BEEP();
-			rup = 0;
+			rup = 0;									   // 标志为清零
 			RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
 		}
-		if (MENU < 2 || MENU > 8)
+		if (MENU < 2 || MENU > 8) // 不在时间设置时，才更新时间；并且显示温度时不更新温度
 		{
 			RTC_Get(&ryear, &rmon, &rday, &rhour, &rmin, &rsec, &rweek); // 读出RTC时间
 			LM75A_GetTemp(temp);
 		}
-		// 循环显示
-		if (MENU < 3 && t == 1)
-			MENU = 0;
-		if (MENU < 3 && t == 1000)
-			MENU = 2;
-		if (MENU < 3 && t == 2000)
-			MENU = 1;
-		if (MENU < 3 && t > 8000)
-			t = 0;
-		t++;
 
-		//闹钟响铃
-		if(alhour[MENU2-1] || almin[MENU2-1])
+		if (MENU < 3) // 循环显示0-2菜单
 		{
-
+			t++;
+			if (t == 1)
+				MENU = 0;
+			if (t == 1000)
+				MENU = 2;
+			if (t == 2000)
+				MENU = 1;
+			if (t > 8000)
+				t = 0;
 		}
 
-		if (MENU == 0) // 显示年月日
+		if (MENU < 3) // 年月期-时分秒-温度的显示
 		{
-			TM1640_display(0, ryear % 100 / 10); // 年
-			TM1640_display(1, ryear % 100 % 10);
-			TM1640_display(2, 21);		  //-
-			TM1640_display(3, rmon / 10); // 月
-			TM1640_display(4, rmon % 10);
-			TM1640_display(5, 21);		  //-
-			TM1640_display(6, rday / 10); // 日
-			TM1640_display(7, rday % 10);
+			if (MENU == 0) // 显示年月日
+			{
+				TM1640_display(0, ryear % 100 / 10); // 年
+				TM1640_display(1, ryear % 100 % 10);
+				TM1640_display(2, 21);		  //-
+				TM1640_display(3, rmon / 10); // 月
+				TM1640_display(4, rmon % 10);
+				TM1640_display(5, 21);		  //-
+				TM1640_display(6, rday / 10); // 日
+				TM1640_display(7, rday % 10);
+			}
+			else if (MENU == 1) // 显示时分秒
+			{
+				TM1640_display(0, 20); // 空
+				TM1640_display(1, 20);
+				TM1640_display(2, rhour / 10); // 时
+				TM1640_display(3, rhour % 10 + 10);
+				TM1640_display(4, rmin / 10); // 分
+				TM1640_display(5, rmin % 10 + 10);
+				TM1640_display(6, rsec / 10); // 秒
+				TM1640_display(7, rsec % 10);
+			}
+			else if (MENU == 2) // 显示温度
+			{
+				TM1640_display(0, 20); // 空
+				TM1640_display(1, 20);
+				if (temp[0] == 0)		   // 判断温度正负
+					TM1640_display(2, 20); // 不显示符号
+				else
+					TM1640_display(2, 21); // 显示-符号
+				TM1640_display(3, temp[1] % 100 / 10);
+				TM1640_display(4, temp[1] % 10 + 10); // 温度
+				TM1640_display(5, temp[2] % 100 / 10);
+				TM1640_display(6, temp[2] % 10);
+				TM1640_display(7, 22);
+			}
+
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A)) // 读触摸按键的电平
 			{
 				BUZZER_KEY_BEEP();
@@ -117,95 +160,31 @@ int main(void) // 主程序
 				MENU = 3;
 			}
 		}
-		if (MENU == 1) // 显示时分秒
+
+		if (MENU < 3 && alFlag == 0) // 闹钟响铃后，alFlag为1，不再判断闹钟
 		{
-			TM1640_display(0, 20); // 空
-			TM1640_display(1, 20);
-			TM1640_display(2, rhour / 10); // 时
-			TM1640_display(3, rhour % 10 + 10);
-			TM1640_display(4, rmin / 10); // 分
-			TM1640_display(5, rmin % 10 + 10);
-			TM1640_display(6, rsec / 10); // 秒
-			TM1640_display(7, rsec % 10);
-			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A)) // 读触摸按键的电平
+			for (i = 0; i < 8; i++) // 循环判断8个闹钟
 			{
-				BUZZER_KEY_BEEP();
-				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A))
-					;
-				MENU = 0;
-			}
-
-			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B)) // 读触摸按键的电平
-			{
-				BUZZER_KEY_BEEP();
-				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B))
-					;
-				MENU = 1;
-			}
-
-			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C)) // 读触摸按键的电平
-			{
-				BUZZER_KEY_BEEP();
-				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C))
-					;
-				MENU = 2;
-			}
-
-			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D)) // 读触摸按键的电平
-			{
-
-				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D))
-					;
-				MENU = 3;
+				if (alhour[i] == rhour && almin[i] == rmin)
+				{
+					alFlag = 1;//表示有闹钟触发
+					MENU = 200;//跳转到闹钟处理菜单
+					MENU2 = i + 1; // MENU2记录响铃闹钟，1-8表示闹钟的，i为0时表示是闹钟1的时间，这里所以要+1
+					t = 0;
+				}
 			}
 		}
-		if (MENU == 2) // 显示温度
-		{
-
-			TM1640_display(0, 20); // 空
-			TM1640_display(1, 20);
-			if (temp[0] == 0)		   // 判断温度正负
-				TM1640_display(2, 20); // 不显示符号
-			else
-				TM1640_display(2, 21); // 显示-符号
-			TM1640_display(3, temp[1] % 100 / 10);
-			TM1640_display(4, temp[1] % 10 + 10); // 温度
-			TM1640_display(5, temp[2] % 100 / 10);
-			TM1640_display(6, temp[2] % 10);
-			TM1640_display(7, 22);									//'C'
-			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A)) // 读触摸按键的电平
+		if (alFlag == 1) //闹钟响铃时间
 			{
-				BUZZER_KEY_BEEP();
-				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A))
-					;
-				MENU = 0;
+				t++;
+				if (t > 6000)
+				{
+					MENU = 1;
+					alFlag = 0; //闹钟循环t次后，一般大于1分钟，如果不大于一分钟，置零后会再次判断闹钟响铃
+				}
 			}
 
-			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B)) // 读触摸按键的电平
-			{
-				BUZZER_KEY_BEEP();
-				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B))
-					;
-				MENU = 1;
-			}
-
-			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C)) // 读触摸按键的电平
-			{
-				BUZZER_KEY_BEEP();
-				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C))
-					;
-				MENU = 2;
-			}
-
-			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D)) // 读触摸按键的电平
-			{
-
-				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D))
-					;
-				MENU = 3;
-			}
-		}
-		if (MENU == 3) // 设置菜单
+		if (MENU == 3) // 设置菜单，增加选择菜单，MENU2的值：0为设置时间，1-8为闹钟
 		{
 			TM1640_display(0, 23); //'S'
 			TM1640_display(1, 24); //'E'
@@ -216,41 +195,88 @@ int main(void) // 主程序
 			TM1640_display(6, 20);
 			TM1640_display(7, 20);
 			BUZZER_SET_BEEP();
-			// delay_ms(500);
-			MENU = 100;
-			MENU2 = 0;
+			MENU = 100; // 跳转到设置选项
+			MENU2 = 0;	// 默认为SET:时间设置
 		}
 
-		if (MENU == 100) // 增加闹钟功能
+		if (MENU == 100) // 设置选项，增加闹钟功能
 		{
 			if (MENU2 == 0) // SET
 			{
-				TM1640_display(0, 23); //'S'
-				TM1640_display(1, 24); //'E'
-				TM1640_display(2, 25); //'t'
+				i++;
+				if (i > 300) // 字符闪烁
+				{
+					TM1640_display(0, 23); //'S'
+					TM1640_display(1, 24); //'E'
+					TM1640_display(2, 25); //'t'
+				}
+				else
+				{
+					TM1640_display(0, 20);
+					TM1640_display(1, 20);
+					TM1640_display(2, 20);
+				}
+				if (i > 600)
+					i = 0;
+				TM1640_display(3, 20);
+				TM1640_display(4, 20);
+				TM1640_display(5, 20);
+				TM1640_display(6, 20);
+				TM1640_display(7, 20);
 			}
-			if (MENU2 >= 1) // AL闹钟
+			if (MENU2 >= 1) // AL闹钟：1-8
 			{
-				TM1640_display(0, 26);	  //'A'
-				TM1640_display(1, 27);	  //'L'
-				TM1640_display(2, MENU2); //'MENU2的值'
+				i++;
+				if (i > 300)
+				{
+					TM1640_display(0, 26);	  //'A'
+					TM1640_display(1, 27);	  //'L'
+					TM1640_display(2, MENU2); //'MENU2的值'
+				}
+				else
+				{
+					TM1640_display(0, 20);
+					TM1640_display(1, 20);
+					TM1640_display(2, 20);
+				}
+				if (i > 600)
+					i = 0;
+
+				TM1640_display(3, 20);
+
+				// 显示对应闹钟的设置内容
+				if (alhour[MENU2 - 1] == 24)
+				{
+					TM1640_display(4, 28); // o
+					TM1640_display(5, 29); // F
+					TM1640_display(6, 29); // F
+					TM1640_display(7, 20); // 空
+				}
+				else
+				{
+					TM1640_display(4, alhour[MENU2 - 1] / 10); // 时
+					TM1640_display(5, alhour[MENU2 - 1] % 10 + 10);
+					TM1640_display(6, almin[MENU2 - 1] / 10); // 分
+					TM1640_display(7, almin[MENU2 - 1] % 10);
+				}
 			}
 
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A)) // 读触摸按键的电平
 			{
+				i = 301; // 关闭数字闪烁
 				BUZZER_KEY_BEEP();
 				MENU2++;
 				if (MENU2 > 8)
 				{
 					MENU2 = 0;
 				}
-
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A))
 					;
 			}
 
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B)) // 读触摸按键的电平
 			{
+				i = 301; // 关闭数字闪烁
 				BUZZER_KEY_BEEP();
 
 				if (MENU2 == 0)
@@ -269,7 +295,7 @@ int main(void) // 主程序
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C)) // 读触摸按键的电平
 			{
 				BUZZER_KEY_BEEP();
-				MENU = 101 + MENU2;
+				MENU = 101 + MENU2; // 根据菜单选项，跳到对应的设置，
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C))
 					;
 			}
@@ -281,9 +307,9 @@ int main(void) // 主程序
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D))
 					;
 			}
-			if (MENU == 101) // 设置时间
+			if (MENU == 101) // 跳转到设置时间
 				MENU = 4;
-			if (MENU >= 102 && MENU <= 109) // 设置闹钟1-8，MENU从150开始
+			if (MENU >= 102 && MENU <= 109) // 跳转到设置闹钟1-8，MENU从150开始
 			{
 				MENU = 150;
 			}
@@ -348,7 +374,6 @@ int main(void) // 主程序
 						ryear = 2000;
 					}
 				}
-
 				c = 0; // 参数清0
 			}
 
@@ -674,24 +699,47 @@ int main(void) // 主程序
 			TM1640_display(3, 20);	  // 空
 			if (i > 300)
 			{
-				TM1640_display(4, alhour[MENU2 - 1] / 10); // 时
-				TM1640_display(5, alhour[MENU2 - 1] % 10 + 10);
+				if (alhour[MENU2 - 1] == 24)
+				{
+					TM1640_display(4, 28); // o
+					TM1640_display(5, 29); // F
+					TM1640_display(6, 29); // F
+					TM1640_display(7, 20); // 空
+				}
+				else
+				{
+					TM1640_display(4, alhour[MENU2 - 1] / 10); // 时
+					TM1640_display(5, alhour[MENU2 - 1] % 10 + 10);
+				}
 			}
 			else
 			{
-				TM1640_display(4, 20); // 时
-				TM1640_display(5, 20);
+				if (alhour[MENU2 - 1] == 24)
+				{
+					TM1640_display(4, 20); // 空
+					TM1640_display(5, 20); // 空
+					TM1640_display(6, 20); // 空
+					TM1640_display(7, 20); // 空
+				}
+				else
+				{
+					TM1640_display(4, 20); // 空
+					TM1640_display(5, 20);
+				}
 			}
 			if (i > 600)
 				i = 0;
 
-			TM1640_display(6, almin[MENU2 - 1] / 10); // 分
-			TM1640_display(7, almin[MENU2 - 1] % 10 + 10);
+			if (alhour[MENU2 - 1] != 24)
+			{
+				TM1640_display(6, almin[MENU2 - 1] / 10); // 分
+				TM1640_display(7, almin[MENU2 - 1] % 10);
+			}
 
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A)) // 读触摸按键的电平
 			{
 				alhour[MENU2 - 1]++;
-				if (alhour[MENU2 - 1] > 23)
+				if (alhour[MENU2 - 1] > 24)
 				{
 					alhour[MENU2 - 1] = 0;
 				}
@@ -705,7 +753,7 @@ int main(void) // 主程序
 			{
 				if (alhour[MENU2 - 1] == 0)
 				{
-					alhour[MENU2 - 1] = 23;
+					alhour[MENU2 - 1] = 24;
 				}
 				else
 				{
@@ -719,7 +767,15 @@ int main(void) // 主程序
 
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C)) // 读触摸按键的电平
 			{
-				MENU = 151;
+				ALFlash_W();
+				if (alhour[MENU2 - 1] != 24)
+				{
+					MENU = 151;
+				}
+				else
+				{
+					MENU = 100;
+				}
 				BUZZER_KEY_BEEP();
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C))
 					;
@@ -727,6 +783,7 @@ int main(void) // 主程序
 
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D)) // 读触摸按键的电平
 			{
+				ALFlash_W();
 				MENU = 0;
 				BUZZER_QUIT_SET_BEEP();
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D))
@@ -745,7 +802,7 @@ int main(void) // 主程序
 			if (i > 300)
 			{
 				TM1640_display(6, almin[MENU2 - 1] / 10); // 分
-				TM1640_display(7, almin[MENU2 - 1] % 10 + 10);
+				TM1640_display(7, almin[MENU2 - 1] % 10);
 			}
 			else
 			{
@@ -786,7 +843,8 @@ int main(void) // 主程序
 
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C)) // 读触摸按键的电平
 			{
-				MENU = 150;
+				ALFlash_W();
+				MENU = 100;
 				BUZZER_KEY_BEEP();
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C))
 					;
@@ -794,8 +852,56 @@ int main(void) // 主程序
 
 			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D)) // 读触摸按键的电平
 			{
+				ALFlash_W();
 				MENU = 0;
 				BUZZER_QUIT_SET_BEEP();
+				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D))
+					;
+			}
+		}
+
+		if (MENU == 200) // 闹钟处理
+		{
+			i++;
+			if (i > 300)
+			{
+				// BUZZER_KEY_BEEP();
+				TM1640_display(0, 26);					   //'A'
+				TM1640_display(1, 27);					   //'L'
+				TM1640_display(2, MENU2);				   //'MENU2的值
+				TM1640_display(3, 20);					   // 空
+				TM1640_display(4, alhour[MENU2 - 1] / 10); // 时
+				TM1640_display(5, alhour[MENU2 - 1] % 10 + 10);
+				TM1640_display(6, almin[MENU2 - 1] / 10); // 分
+				TM1640_display(7, almin[MENU2 - 1] % 10);
+			}
+			else
+			{
+				TM1640_display(0, 20); // 空
+				TM1640_display(1, 20); // 空
+				TM1640_display(2, 20); // 空
+				TM1640_display(3, 20); // 空
+				TM1640_display(4, 20); // 空
+				TM1640_display(5, 20); // 空
+				TM1640_display(6, 20); // 空
+				TM1640_display(7, 20); // 空
+			}
+			if (i > 600)
+				i = 0;
+
+			// 闹钟提醒时，任意键退出
+			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A) ||
+				!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B) ||
+				!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C) ||
+				!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D))
+			{
+				MENU = 1;
+				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A))
+					;
+				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B))
+					;
+				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C))
+					;
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D))
 					;
 			}
