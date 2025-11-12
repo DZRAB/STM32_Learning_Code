@@ -133,7 +133,7 @@ void BUZZER_Init(void){ //蜂鸣器的接口初始化
 
 void BUZZER_BEEP1(void){ //蜂鸣器响一声
 	u16 i;
-	for(i=0;i<200;i++){
+	for(i=0;i<50;i++){
 		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(0)); //蜂鸣器接口输出0
 		delay_us(500); //延时		
 		GPIO_WriteBit(BUZZERPORT,BUZZER,(BitAction)(1)); //蜂鸣器接口输出高电平1

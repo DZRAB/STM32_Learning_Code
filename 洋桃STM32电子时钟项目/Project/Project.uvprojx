@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F10X_MD</Define>
               <Undefine></Undefine>
-              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\delay;.\Basic\rtc;.\Basic\sys;.\Basic\usart;.\Hardware\LED;.\Hardware\KEY;.\Basic\flash;.\Hardware\BUZZER;.\Hardware\TOUCH_KEY;.\Hardware\TM1640;.\Hardware\LM75A;.\Basic\i2c</IncludePath>
+              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\delay;.\Basic\rtc;.\Basic\sys;.\Basic\usart;.\Hardware\LED;.\Hardware\KEY;.\Basic\flash;.\Hardware\BUZZER;.\Hardware\TOUCH_KEY;.\Hardware\TM1640;.\Hardware\LM75A;.\Basic\i2c;.\Hardware\RELAY</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -604,6 +604,11 @@
               <FileName>lm75a.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Hardware\LM75A\lm75a.c</FilePath>
+            </File>
+            <File>
+              <FileName>relay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\RELAY\relay.c</FilePath>
             </File>
           </Files>
         </Group>
