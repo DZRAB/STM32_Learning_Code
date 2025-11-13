@@ -31,14 +31,15 @@
 
 int main(void) // 主程序
 {
-	u8 MENU = 0;   // 菜单
-	u8 temp[3];	   // 温度
-	u16 i, a = 0;  // 通用变量
-	u8 c = 0;	   // 判断按键长按的计数
-	u16 t = 0;	   // 循环时间计数变量
-	u8 rup = 0;	   // 时间设置标志位
-	u8 MENU2 = 0;  // 菜单2,增加闹钟功能,0是设置时间,1-8是设置闹钟.9-10是温度报警
-	u8 alFlag = 0; // 闹钟标志位
+	u8 MENU = 0;				 // 菜单
+	u8 temp[3];					 // 温度
+	u16 i, a = 0;				 // 通用变量
+	u8 c = 0;					 // 判断按键长按的计数
+	u16 t = 0;					 // 循环时间计数变量
+	u8 rup = 0;					 // 时间设置标志位
+	u8 MENU2 = 0;				 // 菜单2,增加闹钟功能,0是设置时间,1-8是设置闹钟.9-10是温度报警
+	u8 alFlag = 0;				 // 闹钟标志位
+	u8 tc1Flag = 0, tc2Flag = 0; // 温度报警标志位
 	// 以下2条局部变量--用于RTC时间的读取
 	u16 ryear = 2025;												 // 4位年
 	u8 rmon = 1, rday = 1, rhour = 1, rmin = 1, rsec = 1, rweek = 0; // 2位月日时分秒周													 // 闹钟标志为
@@ -82,6 +83,7 @@ int main(void) // 主程序
 			rup = 0;									   // 标志为清零
 			RTC_Set(ryear, rmon, rday, rhour, rmin, rsec); // 写入当前时间
 		}
+
 		if (MENU < 2 || MENU > 8) // 不在时间设置时，才更新时间；并且显示温度时不更新温度
 		{
 			RTC_Get(&ryear, &rmon, &rday, &rhour, &rmin, &rsec, &rweek); // 读出RTC时间
@@ -221,7 +223,7 @@ int main(void) // 主程序
 
 		if (MENU < 3) // 温度判断
 		{
-			LM75A_GetTemp(temp);
+			//LM75A_GetTemp(temp);
 			for (a = 8; a < 10; a++) // 循环判断2个温度
 			{
 				// 高温报警
@@ -229,16 +231,43 @@ int main(void) // 主程序
 						(alhour[a] * 10 + almin[a]) &&
 					alhour[a] != 0)
 				{
-					MENU = 250;
 					MENU2 = a + 1; // MENU2的9-10记录温度报警，，a为8时表示温度报警1，这里所以要+1
+					if (MENU2 == 9 && tc1Flag != 1) //tc1
+					{
+						BUZZER_SET_BEEP();    
+						tc1Flag = 1;
+						RELAY_1(1);
+						MENU = 1;
+					}
+					if (MENU2 == 10 && tc2Flag != 1) //tc2
+					{
+						BUZZER_SET_BEEP();
+						tc2Flag = 1;
+						RELAY_2(1);
+						MENU = 1;
+					}
 				}
+
 				// 低温报警
 				if ((temp[1] % 100 * 10 + temp[2] % 100 / 10) <
 						(alhour[a] * 10 + almin[a]) &&
 					alhour[a] != 0)
 				{
-					// 低温处理菜单251
-					// MENU = 251;
+					MENU2 = a + 1;
+					if (MENU2 == 9 && tc1Flag != 2) //tc1
+					{
+						BUZZER_SET_BEEP();
+						tc1Flag = 2;
+						RELAY_1(0);
+						MENU = 1;
+					}
+					if (MENU2 == 10 && tc2Flag != 2) //tc2
+					{
+						BUZZER_SET_BEEP();
+						tc2Flag = 2;
+						RELAY_2(0);
+						MENU = 1;
+					}
 				}
 			}
 		}
@@ -399,6 +428,7 @@ int main(void) // 主程序
 			if (MENU >= 110 && MENU <= 111) // 跳转到温度报警9-10
 				MENU = 210;
 		}
+
 		if (MENU == 4) // 设置年
 		{
 			i++;
@@ -1191,70 +1221,6 @@ int main(void) // 主程序
 				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D))
 					;
 			}
-		}
-
-		if (MENU == 250) // 高温报警
-		{
-			LM75A_GetTemp(temp);
-			// 温度小于设定温度，自动退出
-			for (a = 8; a < 10; a++) // 循环判断2个温度
-			{
-				if ((temp[1] % 100 * 10 + temp[2] % 100 / 10) <
-						(alhour[a] * 10 + almin[a]) &&
-					alhour[a] != 0)
-				{
-					MENU = 2;
-				}
-			}
-			BUZZER_SET_BEEP();
-			i++;
-			if (i > 1)
-			{
-				TM1640_display(0, 25); //'t'
-				TM1640_display(1, 22); //'c'
-				TM1640_display(2, MENU2 - 8);
-				TM1640_display(3, 20); // 空
-				TM1640_display(4, temp[1] % 100 / 10);
-				TM1640_display(5, temp[1] % 10 + 10); // 温度
-				TM1640_display(6, temp[2] % 10);
-				TM1640_display(7, 22); // 温度
-			}
-			else
-			{
-				TM1640_display(0, 20); // 空
-				TM1640_display(1, 20); // 空
-				TM1640_display(2, 20); // 空
-				TM1640_display(3, 20); // 空
-				TM1640_display(4, 20); // 空
-				TM1640_display(5, 20); // 空
-				TM1640_display(6, 20); // 空
-				TM1640_display(7, 20); // 空
-			}
-			if (i > 2)
-				i = 0;
-
-			// 高温提醒时，任意键退出
-			if (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A) ||
-				!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B) ||
-				!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C) ||
-				!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D))
-			{
-
-				MENU = 2;
-				BUZZER_KEY_BEEP();
-				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_A))
-					;
-				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_B))
-					;
-				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_C))
-					;
-				while (!GPIO_ReadInputDataBit(TOUCH_KEYPORT, TOUCH_KEY_D))
-					;
-			}
-		}
-
-		if (MENU == 250) // 低温报警
-		{
 		}
 	}
 }
