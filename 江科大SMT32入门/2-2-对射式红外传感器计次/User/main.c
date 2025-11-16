@@ -1,40 +1,36 @@
 #include "stm32f10x.h"
 #include "Delay.h"
+#include "OLED.h"
+#include "CountSensor.h"
 
 /*
 
-*使用库函数点亮LED，端口是PA0，低电平点亮
-*四种GPIO写函数的用法
+*使用库函数-对射式红外传感器计次
+*使用的端口PB14
 
 */
+
+/*	OLED显示函数使用示例：
+	OLED_ShowChar(1, 1, 'A');
+	OLED_ShowString(1, 3, "HelloWorld!");
+	OLED_ShowNum(2, 1, 123, 3);
+	OLED_ShowSignedNum(2, 5, -123, 3);
+	OLED_ShowString(3, 1, "0x");
+	OLED_ShowHexNum(3, 3, 0xabcd, 4);
+	OLED_ShowString(3, 8, "= BIN:");
+	OLED_ShowBinNum(4, 1, 0xabcd, 16);
+*/
+
 int main (void)
 {
-	
-	
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);//启用APB2外设GPIOA的时钟
-	
-	
-	GPIO_InitTypeDef GPIO_InitStructure; //GPIO 初始化结构体
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; //推挽输出
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0; 
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOA,&GPIO_InitStructure); //根据 GPIO_InitStruct 中指定的参数初始化 GPIOx 外围设备
-	
-	
-	while(1){
-		
-		//指定端口设置高电平-三种函数用法
-		//GPIO_SetBits(GPIOA,GPIO_Pin_0); //直接设置指定端口为1高电平
-		//GPIO_WriteBit(GPIOA,GPIO_Pin_0,Bit_SET); //通过第三个参数来设定端口的状态，Bit_SET为1高电平
-		GPIO_Write(GPIOA,0x0001); //可以同时设置整组端口的电平，0x0001二进制:0000 0000 0000 0001，最低位也就是PA0为1高电平
-		Delay_ms(100);
-		
-		//指定端口设置低电平-三种函数用法
-		//GPIO_ResetBits(GPIOA,GPIO_Pin_0); //直接设置指定端口为0低电平
-		//GPIO_WriteBit(GPIOA,GPIO_Pin_0,Bit_RESET);//通过第三个参数来设定端口的状态，Bit_RESET1低电平
-		GPIO_Write(GPIOA,0x00);//可以同时设置整组端口的电平，0x0001二进制:0000 0000 0000 0000，最低位也就是PA0为0低电平
-		Delay_ms(100);
-	
+	OLED_Init();
+	OLED_Clear();
+	CountSensor_Init();
+	OLED_ShowString(1, 1, "CountSensor");
+	OLED_ShowString(2, 1, "Count:");
+	while(1)
+	{
+		OLED_ShowNum(2, 7, CountSensor_Get(),5);
 	}
 }
 
@@ -74,6 +70,38 @@ void GPIO_ResetBits(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 void GPIO_WriteBit(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, BitAction BitVal);
 //将数据写入指定的 GPIO 数据端口
 void GPIO_Write(GPIO_TypeDef* GPIOx, uint16_t PortVal);
+
+//更改指定引脚的映射
+void GPIO_PinRemapConfig(uint32_t GPIO_Remap, FunctionalState NewState);
+
+//选择用作EXTI线的GPIO引脚（AFIO的操作函数）
+void GPIO_EXTILineConfig(uint8_t GPIO_PortSource, uint8_t GPIO_PinSource);
+
+**********************************************************************************
+EXTI常用库函数:
+
+//根据 EXTI_InitStruct 中指定的参数初始化 EXTI 外设
+void EXTI_Init(EXTI_InitTypeDef* EXTI_InitStruct);
+
+//
+FlagStatus EXTI_GetFlagStatus(uint32_t EXTI_Line);
+
+//
+void EXTI_ClearFlag(uint32_t EXTI_Line);
+
+//
+ITStatus EXTI_GetITStatus(uint32_t EXTI_Line);
+
+//
+void EXTI_ClearITPendingBit(uint32_t EXTI_Line);
+**********************************************************************************
+NVIC常用库函数:
+
+//配置优先级分组：抢占优先级和子优先级（响应优先级）
+void NVIC_PriorityGroupConfig(uint32_t NVIC_PriorityGroup);
+
+//根据 NVIC_InitStruct 中指定的参数初始化 NVIC 外设
+void NVIC_Init(NVIC_InitTypeDef* NVIC_InitStruct);
 **********************************************************************************
 */
 
