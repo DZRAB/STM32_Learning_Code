@@ -32,7 +32,7 @@ int main (void)
 		OLED_ShowString(3, 1, "VDC Value:0.00V");
 		OLED_ShowNum(3, 11, (uint16_t)(voltage * 100) / 100, 1);
 		OLED_ShowNum(3, 13, (uint16_t)(voltage * 100) % 100, 2);
-		Delay_ms(100);
+		Delay_ms(500);
 	}
 }
 

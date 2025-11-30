@@ -31,6 +31,7 @@ void AD_Init(void)
 	
 	ADC_Cmd(ADC1,ENABLE);
 	
+	//У׼
 	ADC_ResetCalibration(ADC1);
 	while(ADC_GetResetCalibrationStatus(ADC1) == SET);
 	ADC_StartCalibration(ADC1);
