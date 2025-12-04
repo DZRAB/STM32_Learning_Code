@@ -1,7 +1,7 @@
 #include "stm32f10x.h"
 #include "Delay.h"
 #include "OLED.h"
-#include "SoftwareI2C.h"
+#include "MPU6050.h"
 
 /*	OLED显示函数使用示例：
 	OLED_ShowChar(1, 1, 'A');
@@ -16,24 +16,23 @@
 
 int main (void)
 {
-	uint8_t ACKBit;
 	OLED_Init();
-	OLED_ShowString(1, 1, "SoftwareI2C:" );
-	SoftwareI2C_Init();
+	OLED_ShowString(1, 1, "MPU6050:" );
+	MPU6050_Init();
+	int16_t AccX,AccY,AccZ,GyroX,GyroY,GyroZ;
 	
-	SoftwareI2C_Start();
-	SoftwareI2C_SendByte(0xD0);
-	ACKBit = SoftwareI2C_ReceiveACK();
-	SoftwareI2C_Stop();
-	
-	if(ACKBit == 0)
-	{
-		OLED_ShowString(2, 1, "ACKBit:OK" );
-	}
 	while(1)
 	{
-	
+		MPU6050_GetData(&AccX,&AccY,&AccZ,&GyroX,&GyroY,&GyroZ);
 		
+		OLED_ShowSignedNum(2, 1, AccX, 5);
+		OLED_ShowSignedNum(3, 1, AccY, 5);
+		OLED_ShowSignedNum(4, 1, AccZ, 5);
+		
+		OLED_ShowSignedNum(2, 8, GyroX, 5);
+		OLED_ShowSignedNum(3, 8, GyroY, 5);
+		OLED_ShowSignedNum(4, 8, GyroZ, 5);
+		Delay_ms(500);
 	}
 }
 

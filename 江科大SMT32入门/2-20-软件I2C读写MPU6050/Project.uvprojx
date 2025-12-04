@@ -16,8 +16,8 @@
         <TargetCommonOption>
           <Device>STM32F103C8</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F1xx_DFP.2.4.1</PackID>
-          <PackURL>https://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32F1xx_DFP.2.2.0</PackID>
+          <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x5000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -336,7 +336,7 @@
               <MiscControls>--no-multibyte-chars</MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\Delay;.\Hardware\OLED-0.96-4P-I2C;.\Hardware\LED;.\Hardware\Key;.\Hardware\Buzzer;.\Hardware\LightSensor;.\Hardware\CountSensor;.\Hardware\Encode;.\Basic\Timer;.\Hardware\PWM;.\Hardware\Servo;.\Hardware\Motor;.\Hardware\InputCapture;.\Hardware\ADC;.\Basic\DMA;.\Hardware\USART_SerialPort;.\Basic\SoftwareI2C</IncludePath>
+              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\Delay;.\Hardware\OLED-0.96-4P-I2C;.\Hardware\LED;.\Hardware\Key;.\Hardware\Buzzer;.\Hardware\LightSensor;.\Hardware\CountSensor;.\Hardware\Encode;.\Basic\Timer;.\Hardware\PWM;.\Hardware\Servo;.\Hardware\Motor;.\Hardware\InputCapture;.\Hardware\ADC;.\Basic\DMA;.\Hardware\USART_SerialPort;.\Basic\SoftwareI2C;.\Hardware\MPU6050</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -619,6 +619,11 @@
               <FileName>SoftwareI2C.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Basic\SoftwareI2C\SoftwareI2C.c</FilePath>
+            </File>
+            <File>
+              <FileName>MPU6050.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\MPU6050\MPU6050.c</FilePath>
             </File>
           </Files>
         </Group>
