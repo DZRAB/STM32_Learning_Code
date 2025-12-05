@@ -17,10 +17,10 @@
 int main (void)
 {
 	OLED_Init();
-	OLED_ShowString(1, 1, "MPU6050:" );
+	OLED_ShowString(1, 1, "MPU6050_ID:0x" );
 	MPU6050_Init();
 	int16_t AccX,AccY,AccZ,GyroX,GyroY,GyroZ;
-	
+	OLED_ShowHexNum(1, 14, MPU6050_GetID(), 2);
 	while(1)
 	{
 		MPU6050_GetData(&AccX,&AccY,&AccZ,&GyroX,&GyroY,&GyroZ);
@@ -32,7 +32,7 @@ int main (void)
 		OLED_ShowSignedNum(2, 8, GyroX, 5);
 		OLED_ShowSignedNum(3, 8, GyroY, 5);
 		OLED_ShowSignedNum(4, 8, GyroZ, 5);
-		Delay_ms(500);
+		//Delay_ms(500);
 	}
 }
 
