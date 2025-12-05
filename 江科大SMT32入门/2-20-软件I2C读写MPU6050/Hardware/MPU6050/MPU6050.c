@@ -46,7 +46,6 @@ void MPU6050_Init(void)
 	MPU6050_WriteReg(MPU6050_ACCEL_CONFIG,0x18);
 
 }
-
 uint8_t  MPU6050_GetID(void)
 {
 	return MPU6050_ReadReg(MPU6050_WHO_AM_I);

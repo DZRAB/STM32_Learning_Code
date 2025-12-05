@@ -21,7 +21,6 @@ int main (void)
 	MPU6050_Init();
 	OLED_ShowHexNum(1, 14, MPU6050_GetID(), 2);
 	int16_t AccX,AccY,AccZ,GyroX,GyroY,GyroZ;
-	
 	while(1)
 	{
 		MPU6050_GetData(&AccX,&AccY,&AccZ,&GyroX,&GyroY,&GyroZ);
