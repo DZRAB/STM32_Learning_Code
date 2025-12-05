@@ -2,7 +2,6 @@
 #define __MPU6050_H
 
 #include "stm32f10x.h" 
-#include "SoftwareI2C.h"
 #define MPU6050_ADDRESS	0xD0
 
 //指定地址写寄存器数据
