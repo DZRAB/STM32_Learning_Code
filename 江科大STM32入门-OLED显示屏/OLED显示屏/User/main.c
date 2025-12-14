@@ -10,6 +10,7 @@ int main (void)
 	OLED_ShowString(20,0,"Hello World!",OLED_8X16);
 	
 	OLED_ShowString(20,20,"Hello World!",OLED_6X8);
+	OLED_Printf(0,40,OLED_8X16,"%05d",1234);
 	OLED_Update();
 	while(1)
 	{
