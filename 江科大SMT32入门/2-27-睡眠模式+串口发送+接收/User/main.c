@@ -38,7 +38,7 @@ int main (void)
 		Delay_ms(100);
 		OLED_ShowString(2, 1, "       " );
 		Delay_ms(100);
-		
+		OLED_Clear();
 		__WFI();
 	}
 }
