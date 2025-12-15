@@ -339,7 +339,7 @@
               <MiscControls>--no-multibyte-chars</MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\Delay;.\Hardware\Key;.\Hardware\OLED-0.96-4P-I2C-V1.0</IncludePath>
+              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\Delay;.\Hardware\Key;.\Basic\SoftwareI2C;.\Hardware\LED;.\Hardware\OLED-I2C</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -548,6 +548,11 @@
               <FileType>1</FileType>
               <FilePath>.\Basic\Delay\Delay.c</FilePath>
             </File>
+            <File>
+              <FileName>SoftwareI2C.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Basic\SoftwareI2C\SoftwareI2C.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -559,14 +564,19 @@
               <FilePath>.\Hardware\Key\Key.c</FilePath>
             </File>
             <File>
+              <FileName>LED.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\LED\LED.c</FilePath>
+            </File>
+            <File>
               <FileName>OLED.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Hardware\OLED-0.96-4P-I2C-V1.0\OLED.c</FilePath>
+              <FilePath>.\Hardware\OLED-I2C\OLED.c</FilePath>
             </File>
             <File>
               <FileName>OLED_Data.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Hardware\OLED-0.96-4P-I2C-V1.0\OLED_Data.c</FilePath>
+              <FilePath>.\Hardware\OLED-I2C\OLED_Data.c</FilePath>
             </File>
           </Files>
         </Group>
