@@ -121,15 +121,84 @@ void OLED_ShowString(uint8_t X, uint8_t Page, char *String, uint8_t FontSize)
 	for(i=0; String[i] != '\0'; i++)
 	{
 		OLED_ShowChar(X+i*FontSize,Page,String[i],FontSize);
-	}
-	
+	}	
 }
 
-void OLED_ShowNum(uint8_t X, uint32_t Number, uint8_t Length, uint8_t FontSize);
-void OLED_ShowSignedNum(uint8_t X, int32_t Number, uint8_t Length, uint8_t FontSize);
-void OLED_ShowHexNum(uint8_t X, uint32_t Number, uint8_t Length, uint8_t FontSize);
-void OLED_ShowBinNum(uint8_t X, uint32_t Number, uint8_t Length, uint8_t FontSize);
-void OLED_ShowFloatNum(uint8_t X, double Number, uint8_t IntLength, uint8_t FraLength, uint8_t FontSize);
+uint32_t OLED_Pow(uint32_t X, uint32_t Y)
+{
+	uint32_t Result = 1;
+	while(Y--)
+	{
+		Result = Result * X;
+	}
+	return Result;
+}
+
+void OLED_ShowNum(uint8_t X, uint8_t Page, uint32_t Number, uint8_t Length, uint8_t FontSize)
+{
+	uint8_t i;
+	for(i=0;i<Length;i++)
+	{
+		OLED_ShowChar(X + i*FontSize, Page, Number/OLED_Pow(10,Length-i-1) % 10 + '0',FontSize);
+	}
+}
+
+void OLED_ShowSignedNum(uint8_t X, uint8_t Page, int32_t Number, uint8_t Length, uint8_t FontSize)
+{
+	uint32_t uNumber;
+	if(Number >= 0)
+	{
+		uNumber = Number;
+		OLED_ShowChar(X,Page,'+',FontSize);
+	}else{
+		uNumber = -Number;
+		OLED_ShowChar(X,Page,'-',FontSize);
+	}
+	uint8_t i;
+	for(i=0;i<Length;i++)
+	{
+		OLED_ShowChar(X+ + (i+1)*FontSize, Page, uNumber/OLED_Pow(10,Length-i-1) % 10 + '0',FontSize);
+	}
+}
+
+
+void OLED_ShowHexNum(uint8_t X, uint8_t Page, uint32_t Number, uint8_t Length, uint8_t FontSize)
+{
+	uint8_t i, HexNumber;
+	for(i=0;i<Length;i++)
+	{
+		HexNumber = Number/OLED_Pow(16,Length-i-1) % 16;
+		if(HexNumber < 10)
+		{
+			OLED_ShowChar(X + i*FontSize, Page, HexNumber + '0',FontSize);
+		}else{
+			OLED_ShowChar(X + i*FontSize, Page, HexNumber - 10 + 'A',FontSize);
+		}
+	}
+}
+
+void OLED_ShowBinNum(uint8_t X, uint8_t Page, uint32_t Number, uint8_t Length, uint8_t FontSize)
+{
+	uint8_t i, BinNumber;
+	for(i=0;i<Length;i++)
+	{
+		BinNumber = Number/OLED_Pow(2,Length-i-1) % 2;
+		OLED_ShowChar(X + i*FontSize, Page, BinNumber + '0',FontSize);
+		
+	}
+}
+
+void OLED_ShowFloatNum(uint8_t X, uint8_t Page, double Number, uint8_t IntLength, uint8_t FraLength, uint8_t FontSize)
+{
+	uint32_t IntNumber, FraNumber;
+	IntNumber = (uint32_t)Number;
+	FraNumber = (Number-IntNumber)*OLED_Pow(10,FraLength);//直接转换小数，如果截取显示，不进行四舍五入操作
+	
+	OLED_ShowNum(X, Page, IntNumber, IntLength, FontSize);
+	OLED_ShowChar(X + IntLength*FontSize, Page, '.',FontSize);
+	OLED_ShowNum(X+ (IntLength+1)*FontSize, Page, FraNumber, FraLength, FontSize);
+
+}
 
 void OLED_ShowChinese(uint8_t X, uint8_t Page, char *Chinese)
 {

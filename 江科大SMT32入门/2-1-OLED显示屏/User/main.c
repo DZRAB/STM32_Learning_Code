@@ -20,8 +20,8 @@ int main (void)
 	{
 		OLED_ShowChar(1, 1, 'A');
 		OLED_ShowString(1, 3, "HelloWorld!");
-		OLED_ShowNum(2, 1, 123, 3);
-		OLED_ShowSignedNum(2, 5, -123, 3);
+		OLED_ShowNum(2, 1, 123, 4);
+		OLED_ShowSignedNum(2, 5, -123, 4);
 		OLED_ShowString(3, 1, "0x");
 		OLED_ShowHexNum(3, 3, 0xabcd, 4);
 		OLED_ShowString(3, 8, "= BIN:");

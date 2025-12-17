@@ -7,7 +7,11 @@ int main (void)
 {
 	LED_Init();
 	OLED_Init();
-	OLED_ShowChinese(0,0,"ƒ„∫√£¨’≈Ê√Ê√£¨∞°");
+	OLED_ShowFloatNum(0,0,123.456,3,3,8);
+	OLED_ShowBinNum(0,2,0xAA,8,8);
+	OLED_ShowBinNum(0,4,0xAA,8,6);
+	OLED_ShowBinNum(0,5,0xAA,8,6);
+	OLED_ShowNum(0,6,456,4,8);
 	while(1)
 	{
 	}
