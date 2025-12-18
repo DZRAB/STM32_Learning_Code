@@ -2,40 +2,47 @@
 #include "Delay.h"
 #include "OLED.h"
 #include "LED.h"
+#include <math.h>
 
 int main (void)
 {
 	LED_Init();
 	OLED_Init();
-//	
-//	OLED_ShowChar(7,7,'A',6);
-//	OLED_ShowString(10,0,"CD",8);
-//	OLED_ShowNum(40, 0,123, 3, 8);
-//	OLED_ShowSignedNum(70, 0,-456, 3, 8);
-//	OLED_ShowSignedNum(0, 2, 789, 3, 8);
-//	OLED_ShowHexNum(40, 2, 0xAA, 2, 8);
-//	OLED_ShowBinNum(60, 2, 0xAA, 8, 8);
-
-//	OLED_ShowFloatNum(0, 4, 3.1415, 1, 4, 8);
-//	OLED_ShowChinese(60, 4, "你好世界");
-//	OLED_Updata();
-	
-	OLED_ShowChar(7,7,'A',8);
-	OLED_ShowChar(7,7,'B',8);
-	OLED_Updata();
-	
 	
 	while(1)
 	{
-//		for(uint8_t i=0;i<63;i++)
+//		for(uint8_t x=0;x<128;x++)
 //		{
-//			OLED_Clear();
-//			OLED_ShowImage(i*2,i,15,15,Img);
-//			OLED_ShowString(i*2+16,i,"Hello",8);
-//			OLED_ShowChinese(i*2,i+16, "你好世界");
+//			OLED_DrawPoint(x,sin(x/128.0 * 2 * 3.14)*32+32);
 //			OLED_Updata();
-//			Delay_ms(10);
 //		}
+//		for(uint8_t x=0;x<128;x++)
+//		{
+//			OLED_DrawPoint(x,64/2);
+//			OLED_Updata();
+//		}
+//		for(uint8_t x=0;x<64;x++)
+//		{
+//			OLED_DrawPoint(128/2,x);
+//			OLED_Updata();
+//		}
+//		
+//		if(OLED_GetPoint(0,32))
+//		{
+//			OLED_ShowString(0,0,"YES",8);
+//		}
+//		else
+//		{
+//			OLED_ShowString(0,0,"NO ",8);
+//		}
+
+		//OLED_Clear();
+		for(uint16_t i=0;i<360;i+=20)
+		{
+			OLED_DrawLine(64,32,64+30*cos(i/360.*2*3.14),32+30*sin(i/360.*2*3.14));
+			OLED_Updata();
+		}
+		
 	}
 }
 

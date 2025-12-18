@@ -6,6 +6,8 @@
 #include "SoftwareI2C.h"
 #include "OLED_Data.h"
 #include <string.h>
+#include <math.h>
+
 
 extern uint8_t OLED_DisplayBuf[8][128];
 
@@ -27,11 +29,14 @@ void OLED_ShowBinNum(uint8_t X, uint8_t Y, uint32_t Number, uint8_t Length, uint
 void OLED_ShowFloatNum(uint8_t X, uint8_t Y, double Number, uint8_t IntLength, uint8_t FraLength, uint8_t FontSize);
 
 void OLED_ShowChinese(uint8_t X, uint8_t Y, char *Chinese);
+void OLED_ClearArea(uint8_t X, uint8_t Y, uint8_t Width, uint8_t Height);
 void OLED_ShowImage(uint8_t X, uint8_t Y, uint8_t Width, uint8_t Height, const uint8_t *Image);
 
 void OLED_Printf(uint8_t X, uint8_t FontSize, char *format, ...);
 
-
+void OLED_DrawPoint(uint8_t X, uint8_t Y);
+uint8_t OLED_GetPoint(uint8_t X, uint8_t Y);
+void OLED_DrawLine(uint8_t X0, uint8_t Y0, uint8_t X1, uint8_t Y1);
 
 #endif
 

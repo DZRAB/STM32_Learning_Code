@@ -273,5 +273,58 @@ void OLED_ShowImage(uint8_t X, uint8_t Y, uint8_t Width, uint8_t Height, const u
 void OLED_Printf(uint8_t X, uint8_t FontSize, char *format, ...);
 
 
+void OLED_DrawPoint(uint8_t X, uint8_t Y)
+{
+	OLED_DisplayBuf[Y/8][X] |= 0x01  << (Y%8);
+}
+
+uint8_t OLED_GetPoint(uint8_t X, uint8_t Y)
+{
+	if(OLED_DisplayBuf[Y/8][X] & 0x01 << (Y%8))
+	{
+		return 1;
+	}
+	return 0;
+}
+void OLED_DrawLine(uint8_t X0, uint8_t Y0, uint8_t X1, uint8_t Y1)
+{
+	float k = (float)(Y1-Y0)/(X1-X0);
+	uint8_t Temp;
+	if(fabs(k)<1)
+	{
+		if(X0>X1)
+		{
+			Temp =X0;
+			X0=X1;
+			X1=Temp;
+			
+			Temp = Y0;
+			Y0 = Y1;
+			Y1 = Temp;
+		}
+		for(uint8_t x=X0;x<=X1;x++)
+		{
+			OLED_DrawPoint(x,round(Y0+(x-X0)*k));
+		}
+	}
+	else
+	{
+		if(Y0>Y1)
+		{
+			Temp =X0;
+			X0=X1;
+			X1=Temp;
+			
+			Temp = Y0;
+			Y0 = Y1;
+			Y1 = Temp;
+		}
+		for(uint8_t y=Y0;y<=Y1;y++)
+		{
+			OLED_DrawPoint(round(X0+(y-Y0)/k),y);
+		}
+	}
+}
+
 
 
