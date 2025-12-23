@@ -18,7 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "usart.h"
+#include "i2c.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -67,6 +67,7 @@ int main(void)
 
   /* USER CODE BEGIN 1 */
 
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -76,6 +77,7 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
+	
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -87,33 +89,30 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART1_UART_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	uint8_t USARTReciveData[1];
-	char *USARTTransmitData;
-
+	uint16_t OLEDAddress = 0x78;
+	uint8_t OLEDTranData[] = {0x00,0x8d,0x14,0xaf,0xa5};
+	uint16_t OLEDTranSize = sizeof(OLEDTranData)/sizeof(OLEDTranData[0]);
+	uint8_t OLEDReceData = 0xFF;
+	
+	HAL_I2C_Master_Transmit(&hi2c1,OLEDAddress,OLEDTranData,OLEDTranSize,HAL_MAX_DELAY);
+	HAL_I2C_Master_Receive(&hi2c1,OLEDAddress,&OLEDReceData,1,HAL_MAX_DELAY);
+	if((OLEDReceData & (0x01<<6)) == 0)
+	{
+		HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin,GPIO_PIN_RESET);
+	}
+	else
+	{
+		HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin,GPIO_PIN_SET);
+	}
   while (1)
   {
-		HAL_UART_Receive(&huart1,USARTReciveData,1,HAL_MAX_DELAY);
-		if(USARTReciveData[0] == '0')
-		{
-			HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-			USARTTransmitData = "LED ON";
-			HAL_UART_Transmit(&huart1,(uint8_t*)USARTTransmitData,6,HAL_MAX_DELAY);
-
-		}
-		else if(USARTReciveData[0] == '1')
-		{
-			HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-			USARTTransmitData = "LED OFF";
-			HAL_UART_Transmit(&huart1,(uint8_t*)USARTTransmitData,7,HAL_MAX_DELAY);
-		}
-
 
     /* USER CODE END WHILE */
 
