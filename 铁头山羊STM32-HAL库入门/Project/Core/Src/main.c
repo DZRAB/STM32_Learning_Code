@@ -92,12 +92,26 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	uint8_t LEDState = 1;
   while (1)
   {
-		HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-		HAL_Delay(300);
-		HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-		HAL_Delay(300);
+		if(HAL_GPIO_ReadPin(KEY_GPIO_Port,KEY_Pin) == 0)
+		{
+			HAL_Delay(20);
+			
+			if(LEDState == 1)
+			{
+				LEDState = 0;
+				HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+			}
+			else
+			{
+				LEDState = 1;
+				HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+			}
+			while(HAL_GPIO_ReadPin(KEY_GPIO_Port,KEY_Pin) == 0);
+		}
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
