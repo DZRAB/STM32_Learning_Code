@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -86,31 +87,33 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	uint8_t LEDState = 1;
+	uint8_t USARTReciveData[1];
+	char *USARTTransmitData;
+
   while (1)
   {
-		if(HAL_GPIO_ReadPin(KEY_GPIO_Port,KEY_Pin) == 0)
+		HAL_UART_Receive(&huart1,USARTReciveData,1,HAL_MAX_DELAY);
+		if(USARTReciveData[0] == '0')
 		{
-			HAL_Delay(20);
-			
-			if(LEDState == 1)
-			{
-				LEDState = 0;
-				HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-			}
-			else
-			{
-				LEDState = 1;
-				HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-			}
-			while(HAL_GPIO_ReadPin(KEY_GPIO_Port,KEY_Pin) == 0);
+			HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+			USARTTransmitData = "LED ON";
+			HAL_UART_Transmit(&huart1,(uint8_t*)USARTTransmitData,6,HAL_MAX_DELAY);
+
 		}
+		else if(USARTReciveData[0] == '1')
+		{
+			HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+			USARTTransmitData = "LED OFF";
+			HAL_UART_Transmit(&huart1,(uint8_t*)USARTTransmitData,7,HAL_MAX_DELAY);
+		}
+
 
     /* USER CODE END WHILE */
 
