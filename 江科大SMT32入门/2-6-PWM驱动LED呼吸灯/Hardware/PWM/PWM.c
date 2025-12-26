@@ -3,29 +3,29 @@
 
 void PWM_Init(void)
 {
-	//ÅäÖÃRCC-APB1
+	//é…ç½®RCC-APB1
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2,ENABLE);
-	//ÅäÖÃRCC-GPIOA
+	//é…ç½®RCC-GPIOA
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);
-	//ÅäÖÃRCC-AFIOÖØÓ³Éä
+	//é…ç½®RCC-AFIOé‡æ˜ å°„
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);
 	
-	//ÅäÖÃAFIOÖØÓ³Éä
+	//é…ç½®AFIOé‡æ˜ å°„
 	GPIO_PinRemapConfig(GPIO_PartialRemap1_TIM2,ENABLE);
-	//½â³ıJTAGÓ³Éä
+	//è§£é™¤JTAGæ˜ å°„
 	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable,ENABLE);
 	
-	//ÅäÖÃGPIOA
+	//é…ç½®GPIOA
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;//PA0ÖØÓ³ÉäÎªPA15
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;//PA0é‡æ˜ å°„ä¸ºPA15
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
 	
-	//Ñ¡ÔñÊ±ÖÓÔ´-ÄÚ²¿Ê±ÖÓ
+	//é€‰æ‹©æ—¶é’Ÿæº-å†…éƒ¨æ—¶é’Ÿ
 	TIM_InternalClockConfig(TIM2);
 	
-	//ÅäÖÃÊ±»ùµ¥Ôª
+	//é…ç½®æ—¶åŸºå•å…ƒ
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
 	TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
@@ -34,13 +34,13 @@ void PWM_Init(void)
 	TIM_TimeBaseInitStructure.TIM_RepetitionCounter = 0;
 	TIM_TimeBaseInit(TIM2, &TIM_TimeBaseInitStructure);
 	
-	//ÅäÖÃÊä³ö±È½Ïµ¥Ôª
-	/*ÆµÂÊ1KHZ Õ¼¿Õ±È50% ·Ö±æÂÊ1%
-	¡ñ PWMÆµÂÊ£º	Freq = CK_PSC / (PSC + 1) / (ARR + 1) 
+	//é…ç½®è¾“å‡ºæ¯”è¾ƒå•å…ƒ
+	/*é¢‘ç‡1KHZ å ç©ºæ¯”50% åˆ†è¾¨ç‡1%
+	â— PWMé¢‘ç‡ï¼š	Freq = CK_PSC / (PSC + 1) / (ARR + 1) 
 					 = 72M / (719 + 1) / (99 + 1) 
-	¡ñ PWMÕ¼¿Õ±È£º	Duty = CCR / (ARR + 1)  
+	â— PWMå ç©ºæ¯”ï¼š	Duty = CCR / (ARR + 1)  
 						= 50 / (99 + 1)
-	¡ñ PWM·Ö±æÂÊ£º	Reso = 1 / (ARR + 1) 
+	â— PWMåˆ†è¾¨ç‡ï¼š	Reso = 1 / (ARR + 1) 
 						= 1 / (99 + 1)
 	*/
 	
@@ -52,7 +52,7 @@ void PWM_Init(void)
 	TIM_OCInitStructure.TIM_Pulse = 50; //CCR 
 	TIM_OC1Init(TIM2,&TIM_OCInitStructure);
 	
-	//ÔËĞĞ¿ØÖÆ
+	//è¿è¡Œæ§åˆ¶
 	TIM_Cmd(TIM2, ENABLE);
 }
 

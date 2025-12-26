@@ -4,12 +4,12 @@
 
 void Key_Init(void)
 {
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);//ÆôÓÃAPB2ÍâÉèGPIOxµÄÊ±ÖÓ
-	GPIO_InitTypeDef GPIO_InitStructure; //GPIO ³õÊ¼»¯½á¹¹Ìå
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; //ÉÏÀ­ÊäÈë
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);//å¯ç”¨APB2å¤–è®¾GPIOxçš„æ—¶é’Ÿ
+	GPIO_InitTypeDef GPIO_InitStructure; //GPIO åˆå§‹åŒ–ç»“æ„ä½“
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; //ä¸Šæ‹‰è¾“å…¥
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_11; 
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOB,&GPIO_InitStructure); //¸ù¾İ GPIO_InitStruct ÖĞÖ¸¶¨µÄ²ÎÊı³õÊ¼»¯ GPIOx ÍâÎ§Éè±¸
+	GPIO_Init(GPIOB,&GPIO_InitStructure); //æ ¹æ® GPIO_InitStruct ä¸­æŒ‡å®šçš„å‚æ•°åˆå§‹åŒ– GPIOx å¤–å›´è®¾å¤‡
 }
 
 uint8_t Key_GetNum(void)

@@ -3,12 +3,12 @@
 
 void LED_Init(void)
 {
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);//ÆôÓÃAPB2ÍâÉèGPIOxµÄÊ±ÖÓ
-	GPIO_InitTypeDef GPIO_InitStructure; //GPIO ³õÊ¼»¯½á¹¹Ìå
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; //ÍÆÍìÊä³ö
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);//å¯ç”¨APB2å¤–è®¾GPIOxçš„æ—¶é’Ÿ
+	GPIO_InitTypeDef GPIO_InitStructure; //GPIO åˆå§‹åŒ–ç»“æ„ä½“
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; //æ¨æŒ½è¾“å‡º
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_2; 
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOA,&GPIO_InitStructure); //¸ù¾İ GPIO_InitStruct ÖĞÖ¸¶¨µÄ²ÎÊı³õÊ¼»¯ GPIOx ÍâÎ§Éè±¸
+	GPIO_Init(GPIOA,&GPIO_InitStructure); //æ ¹æ® GPIO_InitStruct ä¸­æŒ‡å®šçš„å‚æ•°åˆå§‹åŒ– GPIOx å¤–å›´è®¾å¤‡
 	GPIO_SetBits(GPIOA, GPIO_Pin_1 | GPIO_Pin_2);
 }
 

@@ -4,7 +4,7 @@
 #include "stm32f10x.h"
 #include "Delay.h"
 
-void Timer_Init(void); //³õÊ¼»¯TIM2
+void Timer_Init(void); //åˆå§‹åŒ–TIM2
 uint16_t Timer_GetCounter(void);
 
 

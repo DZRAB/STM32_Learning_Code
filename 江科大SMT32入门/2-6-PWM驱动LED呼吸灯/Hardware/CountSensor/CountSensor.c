@@ -5,39 +5,39 @@ uint16_t CountSensor_Count = 0;
 
 void CountSensor_Init(void)
 {
-	//Ê¹ÓÃÍâ²¿ÖÕ¶Ë£¬ĞèÒª¿ªÆôGPIO, AFIO, EXIT, NVICµÄÊ±ÖÓ
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);//ÆôÓÃAPB2ÍâÉèGPIOxµÄÊ±ÖÓ
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);//ÆôÓÃAPB2ÍâÉèAFIOµÄÊ±ÖÓ
-	// EXIT¶ÀÁ¢ÍâÉè²»ĞèÒª¿ªÆôÊ±ÖÓ£¬Ò»Ö±¿ªÆôµÄ
-	// NVICÊÇÄÚºËÄÚµÄÍâÉè²»ĞèÒª¿ªÆôÊ±ÖÓ
+	//ä½¿ç”¨å¤–éƒ¨ç»ˆç«¯ï¼Œéœ€è¦å¼€å¯GPIO, AFIO, EXIT, NVICçš„æ—¶é’Ÿ
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);//å¯ç”¨APB2å¤–è®¾GPIOxçš„æ—¶é’Ÿ
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);//å¯ç”¨APB2å¤–è®¾AFIOçš„æ—¶é’Ÿ
+	// EXITç‹¬ç«‹å¤–è®¾ä¸éœ€è¦å¼€å¯æ—¶é’Ÿï¼Œä¸€ç›´å¼€å¯çš„
+	// NVICæ˜¯å†…æ ¸å†…çš„å¤–è®¾ä¸éœ€è¦å¼€å¯æ—¶é’Ÿ
 	
-	//ÅäÖÃGPIO
-	GPIO_InitTypeDef GPIO_InitStructure; //GPIO ³õÊ¼»¯½á¹¹Ìå
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; //ÉÏÀ­ÊäÈë
+	//é…ç½®GPIO
+	GPIO_InitTypeDef GPIO_InitStructure; //GPIO åˆå§‹åŒ–ç»“æ„ä½“
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; //ä¸Šæ‹‰è¾“å…¥
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOB,&GPIO_InitStructure); //¸ù¾İ GPIO_InitStruct ÖĞÖ¸¶¨µÄ²ÎÊı³õÊ¼»¯ GPIOx ÍâÎ§Éè±¸
+	GPIO_Init(GPIOB,&GPIO_InitStructure); //æ ¹æ® GPIO_InitStruct ä¸­æŒ‡å®šçš„å‚æ•°åˆå§‹åŒ– GPIOx å¤–å›´è®¾å¤‡
 	GPIO_SetBits(GPIOB, GPIO_Pin_12);
 
-	//ÅäÖÃAFIO
-	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource14);//ÅäÖÃAFIOÍâ²¿ÖÕ¶ËÒı½ÅÑ¡Ôñ
+	//é…ç½®AFIO
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource14);//é…ç½®AFIOå¤–éƒ¨ç»ˆç«¯å¼•è„šé€‰æ‹©
 	
 	
-	//ÅäÖÃEXTI
-	EXTI_InitTypeDef EXTI_InitStructure;//EXTI ³õÊ¼»¯½á¹¹Ìå
+	//é…ç½®EXTI
+	EXTI_InitTypeDef EXTI_InitStructure;//EXTI åˆå§‹åŒ–ç»“æ„ä½“
 	EXTI_InitStructure.EXTI_Line = EXTI_Line14;
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt; //ÖĞ¶ÏÄ£Ê½
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling; //ÏÂ½µÑØ´¥·¢
-	EXTI_Init(&EXTI_InitStructure); //EXTI³õÊ¼»¯
+	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt; //ä¸­æ–­æ¨¡å¼
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling; //ä¸‹é™æ²¿è§¦å‘
+	EXTI_Init(&EXTI_InitStructure); //EXTIåˆå§‹åŒ–
 	
-	//ÅäÖÃNVIC
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//ÅäÖÃÓÅÏÈ¼¶·Ö×é£¬Õû¸ö¹¤³ÌÖ»ĞèÒªÖ´ĞĞÒ»´Î£¬¿ÉÒÔ·Åµ½main¿ªÊ¼º¯ÊıÀï¡£
+	//é…ç½®NVIC
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//é…ç½®ä¼˜å…ˆçº§åˆ†ç»„ï¼Œæ•´ä¸ªå·¥ç¨‹åªéœ€è¦æ‰§è¡Œä¸€æ¬¡ï¼Œå¯ä»¥æ”¾åˆ°mainå¼€å§‹å‡½æ•°é‡Œã€‚
 	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure.NVIC_IRQChannel = EXTI15_10_IRQn;//ÆôÓÃÖĞ¶ÏÍ¨µÀ
+	NVIC_InitStructure.NVIC_IRQChannel = EXTI15_10_IRQn;//å¯ç”¨ä¸­æ–­é€šé“
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1; //ÅäÖÃÇÀÕ¼ÓÅÏÈ¼¶
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1; //ÅäÖÃÏìÓ¦ÓÅÏÈ¼¶
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1; //é…ç½®æŠ¢å ä¼˜å…ˆçº§
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1; //é…ç½®å“åº”ä¼˜å…ˆçº§
 	NVIC_Init(&NVIC_InitStructure);
 	
 }
@@ -51,7 +51,7 @@ void EXTI15_10_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(EXTI_Line14) == SET)
 	{
-		//ÅĞ¶ÏÒı½ÅµçÆ½£¬ÒÔ±ÜÃâ¶¶¶¯
+		//åˆ¤æ–­å¼•è„šç”µå¹³ï¼Œä»¥é¿å…æŠ–åŠ¨
 		if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_14) == 0)
 		{
 			CountSensor_Count++;

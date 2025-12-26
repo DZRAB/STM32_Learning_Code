@@ -6,11 +6,11 @@
 
 /*
 
-*Ê¹ÓÃ¿âº¯Êı-¶¨Ê±Æ÷¶¨Ê±ÖĞ¶Ï
+*ä½¿ç”¨åº“å‡½æ•°-å®šæ—¶å™¨å®šæ—¶ä¸­æ–­
 
 */
 
-/*	OLEDÏÔÊ¾º¯ÊıÊ¹ÓÃÊ¾Àı£º
+/*	OLEDæ˜¾ç¤ºå‡½æ•°ä½¿ç”¨ç¤ºä¾‹ï¼š
 	OLED_ShowChar(1, 1, 'A');
 	OLED_ShowString(1, 3, "HelloWorld!");
 	OLED_ShowNum(2, 1, 123, 3);
@@ -47,74 +47,74 @@ int main (void)
 
 /*
 **********************************************************************************
-RCC³£ÓÃ¿âº¯Êı:
+RCCå¸¸ç”¨åº“å‡½æ•°:
 
-//ÆôÓÃ»ò½ûÓÃ AHB ÍâÉèÊ±ÖÓ
+//å¯ç”¨æˆ–ç¦ç”¨ AHB å¤–è®¾æ—¶é’Ÿ
 void RCC_AHBPeriphClockCmd(uint32_t RCC_AHBPeriph, FunctionalState NewState);
 
-//ÆôÓÃ»ò½ûÓÃ ¸ßËÙAHB2 ÍâÉèÊ±ÖÓ
+//å¯ç”¨æˆ–ç¦ç”¨ é«˜é€ŸAHB2 å¤–è®¾æ—¶é’Ÿ
 void RCC_APB2PeriphClockCmd(uint32_t RCC_APB2Periph, FunctionalState NewState);
 
-ÆôÓÃ»ò½ûÓÃ µÍËÙAHB1 ÍâÉèÊ±ÖÓ
+å¯ç”¨æˆ–ç¦ç”¨ ä½é€ŸAHB1 å¤–è®¾æ—¶é’Ÿ
 void RCC_APB1PeriphClockCmd(uint32_t RCC_APB1Periph, FunctionalState NewState);
 **********************************************************************************
-GPIO³£ÓÃ¿âº¯Êı:
+GPIOå¸¸ç”¨åº“å‡½æ•°:
 
-//¸ù¾İ GPIO_InitStruct ÖĞÖ¸¶¨µÄ²ÎÊı³õÊ¼»¯ GPIOx ÍâÎ§Éè±¸
+//æ ¹æ® GPIO_InitStruct ä¸­æŒ‡å®šçš„å‚æ•°åˆå§‹åŒ– GPIOx å¤–å›´è®¾å¤‡
 void GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef* GPIO_InitStruct);
 
-//¶ÁÈ¡Ö¸¶¨µÄÊäÈë¶Ë¿ÚÒı½Å
+//è¯»å–æŒ‡å®šçš„è¾“å…¥ç«¯å£å¼•è„š
 uint8_t GPIO_ReadInputDataBit(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
-//¶ÁÈ¡Ö¸¶¨µÄ GPIO ÊäÈëÊı¾İ¶Ë¿Ú
+//è¯»å–æŒ‡å®šçš„ GPIO è¾“å…¥æ•°æ®ç«¯å£
 uint16_t GPIO_ReadInputData(GPIO_TypeDef* GPIOx);
-//¶ÁÈ¡Ö¸¶¨µÄÊä³öÊı¾İ¶Ë¿ÚµÄÎ»Öµ
+//è¯»å–æŒ‡å®šçš„è¾“å‡ºæ•°æ®ç«¯å£çš„ä½å€¼
 uint8_t GPIO_ReadOutputDataBit(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
-//¶ÁÈ¡Ö¸¶¨µÄ GPIO Êä³öÊı¾İ¶Ë¿Ú
+//è¯»å–æŒ‡å®šçš„ GPIO è¾“å‡ºæ•°æ®ç«¯å£
 uint16_t GPIO_ReadOutputData(GPIO_TypeDef* GPIOx);
 
-//ÉèÖÃËùÑ¡µÄÊı¾İ¶Ë¿ÚÎ»
+//è®¾ç½®æ‰€é€‰çš„æ•°æ®ç«¯å£ä½
 void GPIO_SetBits(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
-//Çå³ıËùÑ¡µÄÊı¾İ¶Ë¿ÚÎ»
+//æ¸…é™¤æ‰€é€‰çš„æ•°æ®ç«¯å£ä½
 void GPIO_ResetBits(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
-//ÉèÖÃ»òÇå³ıÑ¡¶¨µÄÊı¾İ¶Ë¿ÚÎ»
+//è®¾ç½®æˆ–æ¸…é™¤é€‰å®šçš„æ•°æ®ç«¯å£ä½
 void GPIO_WriteBit(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, BitAction BitVal);
-//½«Êı¾İĞ´ÈëÖ¸¶¨µÄ GPIO Êı¾İ¶Ë¿Ú
+//å°†æ•°æ®å†™å…¥æŒ‡å®šçš„ GPIO æ•°æ®ç«¯å£
 void GPIO_Write(GPIO_TypeDef* GPIOx, uint16_t PortVal);
 
-//¸ü¸ÄÖ¸¶¨Òı½ÅµÄÓ³Éä£¨AFIOµÄ²Ù×÷º¯Êı£©
+//æ›´æ”¹æŒ‡å®šå¼•è„šçš„æ˜ å°„ï¼ˆAFIOçš„æ“ä½œå‡½æ•°ï¼‰
 void GPIO_PinRemapConfig(uint32_t GPIO_Remap, FunctionalState NewState);
 
-//Ñ¡ÔñÓÃ×÷EXTIÏßµÄGPIOÒı½Å£¨AFIOµÄ²Ù×÷º¯Êı£©
+//é€‰æ‹©ç”¨ä½œEXTIçº¿çš„GPIOå¼•è„šï¼ˆAFIOçš„æ“ä½œå‡½æ•°ï¼‰
 void GPIO_EXTILineConfig(uint8_t GPIO_PortSource, uint8_t GPIO_PinSource);
 
 **********************************************************************************
-EXTI³£ÓÃ¿âº¯Êı:
+EXTIå¸¸ç”¨åº“å‡½æ•°:
 
-//¸ù¾İ EXTI_InitStruct ÖĞÖ¸¶¨µÄ²ÎÊı³õÊ¼»¯ EXTI ÍâÉè
+//æ ¹æ® EXTI_InitStruct ä¸­æŒ‡å®šçš„å‚æ•°åˆå§‹åŒ– EXTI å¤–è®¾
 void EXTI_Init(EXTI_InitTypeDef* EXTI_InitStruct);
 
-//¼ì²éÊÇ·ñÉèÖÃÁËÖ¸¶¨µÄEXTIĞĞ±êÖ¾
+//æ£€æŸ¥æ˜¯å¦è®¾ç½®äº†æŒ‡å®šçš„EXTIè¡Œæ ‡å¿—
 FlagStatus EXTI_GetFlagStatus(uint32_t EXTI_Line);
 
-//Çå³ıEXTIµÄĞĞ¹ÒÆğ±êÖ¾
+//æ¸…é™¤EXTIçš„è¡ŒæŒ‚èµ·æ ‡å¿—
 void EXTI_ClearFlag(uint32_t EXTI_Line);
 
-//¼ì²éÖ¸¶¨µÄEXTIĞĞÊÇ·ñ±»¶ÏÑÔ
+//æ£€æŸ¥æŒ‡å®šçš„EXTIè¡Œæ˜¯å¦è¢«æ–­è¨€
 ITStatus EXTI_GetITStatus(uint32_t EXTI_Line);
 
-//Çå³ıEXTIµÄĞĞ¹ÒÆğÎ»
+//æ¸…é™¤EXTIçš„è¡ŒæŒ‚èµ·ä½
 void EXTI_ClearITPendingBit(uint32_t EXTI_Line);
 **********************************************************************************
-NVIC³£ÓÃ¿âº¯Êı:
+NVICå¸¸ç”¨åº“å‡½æ•°:
 
-//ÅäÖÃÓÅÏÈ¼¶·Ö×é£ºÇÀÕ¼ÓÅÏÈ¼¶ºÍ×ÓÓÅÏÈ¼¶£¨ÏìÓ¦ÓÅÏÈ¼¶£©
+//é…ç½®ä¼˜å…ˆçº§åˆ†ç»„ï¼šæŠ¢å ä¼˜å…ˆçº§å’Œå­ä¼˜å…ˆçº§ï¼ˆå“åº”ä¼˜å…ˆçº§ï¼‰
 void NVIC_PriorityGroupConfig(uint32_t NVIC_PriorityGroup);
 
-//¸ù¾İ NVIC_InitStruct ÖĞÖ¸¶¨µÄ²ÎÊı³õÊ¼»¯ NVIC ÍâÉè
+//æ ¹æ® NVIC_InitStruct ä¸­æŒ‡å®šçš„å‚æ•°åˆå§‹åŒ– NVIC å¤–è®¾
 void NVIC_Init(NVIC_InitTypeDef* NVIC_InitStruct);
 
 **********************************************************************************
-Timer³£ÓÃ¿âº¯Êı:
+Timerå¸¸ç”¨åº“å‡½æ•°:
 
 void TIM_TimeBaseInit(TIM_TypeDef* TIMx, TIM_TimeBaseInitTypeDef* TIM_TimeBaseInitStruct);
 
@@ -163,7 +163,7 @@ ITStatus TIM_GetITStatus(TIM_TypeDef* TIMx, uint16_t TIM_IT);
 void TIM_ClearITPendingBit(TIM_TypeDef* TIMx, uint16_t TIM_IT);
 
 **********************************************************************************
-Timer-PWM³£ÓÃ¿âº¯Êı:
+Timer-PWMå¸¸ç”¨åº“å‡½æ•°:
 void TIM_OC1Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
 void TIM_OC2Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
 void TIM_OC3Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
