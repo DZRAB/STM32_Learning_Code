@@ -574,8 +574,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\Basic\USART\USART1.c</PathWithFileName>
-      <FilenameWithoutPath>USART1.c</FilenameWithoutPath>
+      <PathWithFileName>.\Basic\I2C\I2C1.c</PathWithFileName>
+      <FilenameWithoutPath>I2C1.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

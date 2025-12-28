@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\Delay;.\Hardware\LED;.\Hardware\Key;.\Basic\USART</IncludePath>
+              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\Delay;.\Hardware\LED;.\Hardware\Key;.\Basic\I2C</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -549,9 +549,9 @@
               <FilePath>.\Basic\Delay\Delay.c</FilePath>
             </File>
             <File>
-              <FileName>USART1.c</FileName>
+              <FileName>I2C1.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Basic\USART\USART1.c</FilePath>
+              <FilePath>.\Basic\I2C\I2C1.c</FilePath>
             </File>
           </Files>
         </Group>

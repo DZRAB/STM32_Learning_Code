@@ -1,4 +1,4 @@
-#include "USART.h"
+#include "USART1.h"
 
 /*USART1，默认复用GPIO初始化*/
 void USART1_DefaultInit(void)
@@ -92,6 +92,21 @@ void USART1_SendBytes(uint8_t *pData, uint16_t Size)
 	while(USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
 }
 
+/*串口1发送字符串*/
+void USART1_SendString(uint8_t *String)
+{
+	//循环发送字符,直到遇到字符串结尾
+	for(uint16_t i=0;String[i]!='\0';i++)
+	{
+		//每次发送字符前，等待USART_FLAG_TXE标志位为1，即发送数据寄存器为空，数据已转移移位寄存器，可以发送新数据
+		while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
+		USART_SendData(USART1,String[i]);
+	}
+	
+	//发送完所有字符后，等待USART_FLAG_TC标志位为1，即数据发送完成
+	while(USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
+}
+
 /*重写fputc，printf可以通过串口1发送格式化字符串数据*/
 int fputc(int ch, FILE *f)
 {
@@ -102,5 +117,16 @@ int fputc(int ch, FILE *f)
 	return ch;
 }
 
-
+/*串口1接收一个字节*/
+uint8_t USART1_ReceiveByte(void)
+{
+	//等待USART_FLAG_RXNE标志位为1，即接收数据寄存器为非空，接收的数据已转移数据寄存器，可以读取数据
+	while(USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET);
+	
+	//发送一个字节
+	uint16_t Byte;
+	Byte = USART_ReceiveData(USART1);
+	
+	return Byte;
+}
 
