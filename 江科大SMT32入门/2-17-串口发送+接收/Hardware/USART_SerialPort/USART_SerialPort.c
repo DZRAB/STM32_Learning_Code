@@ -5,21 +5,21 @@ uint8_t Serial_RxFlag;
 
 void SerialPort_Init(void)
 {
-	//配置USART1的时钟
+	//????USART1?????
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
-	//配置GPIOA的时钟
+	//????GPIOA?????
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 	
-	GPIO_InitTypeDef GPIO_InitStructure; //GPIO 初始化结构体
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP; //TX复用推挽输出
+	GPIO_InitTypeDef GPIO_InitStructure; //GPIO ?????????
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP; //TX???????????
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9; 
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOA,&GPIO_InitStructure); //根据 GPIO_InitStruct 中指定的参数初始化 GPIOx 外围设备
+	GPIO_Init(GPIOA,&GPIO_InitStructure); //???? GPIO_InitStruct ??????????????? GPIOx ??Χ?豸
 	
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; //RX上拉输入
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; //RX????????
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10; 
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOA,&GPIO_InitStructure); //根据 GPIO_InitStruct 中指定的参数初始化 GPIOx 外围设备
+	GPIO_Init(GPIOA,&GPIO_InitStructure); //???? GPIO_InitStruct ??????????????? GPIOx ??Χ?豸
 
 	
 	USART_InitTypeDef USART_InitStructure;
@@ -45,14 +45,14 @@ void SerialPort_Init(void)
 
 }
 
-//发送一个字节
+//??????????
 void SerialPort_SendByte(uint8_t Byte)
 {
 	USART_SendData(USART1, Byte);
 	while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
 }
 
-//发送一个数组
+//???????????
 void SerialPort_SendArray(uint8_t* Array, uint16_t Length)
 {
 	uint16_t i;
@@ -61,7 +61,7 @@ void SerialPort_SendArray(uint8_t* Array, uint16_t Length)
 		SerialPort_SendByte(Array[i]);
 	}
 }
-//发送一个字符串
+//????????????
 void SerialPort_SendString(char* String)
 {
 	uint16_t i;
@@ -71,7 +71,7 @@ void SerialPort_SendString(char* String)
 	}
 }
 
-//计算x的y次方
+//????x??y?η?
 uint32_t SerialPort_Pow(uint32_t x, uint32_t y)
 {
 	uint32_t Result = 1;
@@ -83,7 +83,7 @@ uint32_t SerialPort_Pow(uint32_t x, uint32_t y)
 	return Result;
 }
 
-//发送一串数字
+//???????????
 void SerialPort_SendNumber(uint32_t Number, uint8_t Length)
 {
 	uint8_t i;
@@ -93,14 +93,14 @@ void SerialPort_SendNumber(uint32_t Number, uint8_t Length)
 	}
 }
 
-//重定义printf输出USART1
+//?????printf???USART1
 int fputc(int ch, FILE *f)
 {
 	SerialPort_SendByte(ch);
 	return ch;
 }
 
-//重新封装sprintf
+//???·??sprintf
 void SerialPort_Printf(char* format, ...)
 {
 	char String[100];
@@ -113,7 +113,7 @@ void SerialPort_Printf(char* format, ...)
 
 uint8_t Serial_GetRxFalg(void)
 {
-	//标志为读后自动清除	
+	//??????????????	
 	if(Serial_RxFlag == 1)
 	{
 		Serial_RxFlag = 0;

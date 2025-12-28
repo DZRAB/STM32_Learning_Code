@@ -10,7 +10,7 @@
       <TargetName>Target 1</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060528::V5.06 update 5 (build 528)::ARMCC</pCCUsed>
+      <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -328,18 +328,18 @@
             <uC99>1</uC99>
             <uGnu>0</uGnu>
             <useXO>0</useXO>
-            <v6Lang>1</v6Lang>
-            <v6LangP>1</v6LangP>
+            <v6Lang>3</v6Lang>
+            <v6LangP>3</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
             <v6Lto>0</v6Lto>
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>--no-multibyte-chars</MiscControls>
+              <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\Delay;.\Hardware\OLED-0.96-4P-I2C;.\Hardware\LED;.\Hardware\Key;.\Hardware\Buzzer;.\Hardware\LightSensor;.\Hardware\CountSensor;.\Hardware\Encode;.\Basic\Timer;.\Hardware\PWM;.\Hardware\Servo;.\Hardware\Motor;.\Hardware\InputCapture;.\Hardware\ADC;.\Basic\DMA;.\Hardware\USART_SerialPort</IncludePath>
+              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\Delay;.\Hardware\LED;.\Hardware\Key;.\Basic\USART</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -544,30 +544,20 @@
           <GroupName>Basic</GroupName>
           <Files>
             <File>
-              <FileName>Timer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Basic\Timer\Timer.c</FilePath>
-            </File>
-            <File>
               <FileName>Delay.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Basic\Delay\Delay.c</FilePath>
             </File>
             <File>
-              <FileName>MyDMA.c</FileName>
+              <FileName>USART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Basic\DMA\MyDMA.c</FilePath>
+              <FilePath>.\Basic\USART\USART.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Hardware</GroupName>
           <Files>
-            <File>
-              <FileName>OLED.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\OLED-0.96-4P-I2C\OLED.c</FilePath>
-            </File>
             <File>
               <FileName>LED.c</FileName>
               <FileType>1</FileType>
@@ -577,46 +567,6 @@
               <FileName>Key.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Hardware\Key\Key.c</FilePath>
-            </File>
-            <File>
-              <FileName>Buzzer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\Buzzer\Buzzer.c</FilePath>
-            </File>
-            <File>
-              <FileName>LightSensor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\LightSensor\LightSensor.c</FilePath>
-            </File>
-            <File>
-              <FileName>CountSensor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\CountSensor\CountSensor.c</FilePath>
-            </File>
-            <File>
-              <FileName>Encode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\Encode\Encode.c</FilePath>
-            </File>
-            <File>
-              <FileName>PWM.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\PWM\PWM.c</FilePath>
-            </File>
-            <File>
-              <FileName>InputCapture.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\InputCapture\InputCapture.c</FilePath>
-            </File>
-            <File>
-              <FileName>ADC.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\ADC\ADC.c</FilePath>
-            </File>
-            <File>
-              <FileName>USART_SerialPort.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\USART_SerialPort\USART_SerialPort.c</FilePath>
             </File>
           </Files>
         </Group>
