@@ -9,16 +9,16 @@ int main (void){
 	Key_Init();
 	while(1){
 
-		if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_1) == 0)
-		{
-			Delay_ms(20);
-			GPIO_WriteBit(GPIOC,GPIO_Pin_13,Bit_RESET);
-		}
-		else
-		{
-			GPIO_WriteBit(GPIOC,GPIO_Pin_13,Bit_SET);
-			Delay_ms(20);	
-		}
+//		if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_1) == 0)
+//		{
+//			Delay_ms(20);
+//			GPIO_WriteBit(GPIOC,GPIO_Pin_13,Bit_RESET);
+//		}
+//		else
+//		{
+//			GPIO_WriteBit(GPIOC,GPIO_Pin_13,Bit_SET);
+//			Delay_ms(20);	
+//		}
 
 	}
 }

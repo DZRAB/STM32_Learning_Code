@@ -40,6 +40,7 @@ void HardwareSPI_Init(void)
 	SPI_InitSturcture.SPI_NSS = SPI_NSS_Soft;
 	SPI_Init(SPI1,&SPI_InitSturcture);
 	
+	SPI_NSSInternalSoftwareConfig(SPI1,SPI_NSSInternalSoft_Set);//指定内部软件NSS为高电平
 	SPI_Cmd(SPI1,ENABLE);
 	HardwareSPI_W_SS(1);
 }

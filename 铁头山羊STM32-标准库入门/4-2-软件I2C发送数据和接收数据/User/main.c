@@ -13,8 +13,8 @@ int main (void){
 	Key_Init();
 	SoftwareI2C_Init();
 	Delay_ms(100);
-	//SoftwareI2C_SendBytes(0x78, comd, 5);
-	SoftwareI2C_ReceiveBytes(0x78, &buffer, 1);
+	SoftwareI2C_SendBytes(0x78, comd, 5);
+//	SoftwareI2C_ReceiveBytes(0x78, &buffer, 1);
 	while(1)
 	{
 //		if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_1) == 0)
