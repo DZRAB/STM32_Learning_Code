@@ -5,18 +5,6 @@ void SPI1_Init(void)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1,ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);
 
-	SPI_InitTypeDef SPI_Structure;
-	SPI_Structure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;//72M / 64
-	SPI_Structure.SPI_CPHA = SPI_CPHA_1Edge;
-	SPI_Structure.SPI_CPOL = SPI_CPOL_Low;
-	SPI_Structure.SPI_CRCPolynomial = 7;//默认值
-	SPI_Structure.SPI_DataSize = SPI_DataSize_8b;
-	SPI_Structure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-	SPI_Structure.SPI_FirstBit = SPI_FirstBit_MSB;
-	SPI_Structure.SPI_Mode = SPI_Mode_Master;
-	SPI_Structure.SPI_NSS = SPI_NSS_Soft;
-	SPI_Init(SPI1, &SPI_Structure);
-	
 	/*
 	*初始化SPI1默认复用引脚
 	*SCK-PA5
@@ -35,19 +23,40 @@ void SPI1_Init(void)
 	GPIO_Structure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_Structure);
 
-		
 	GPIO_Structure.GPIO_Mode = GPIO_Mode_IPU;
 	GPIO_Structure.GPIO_Pin = GPIO_Pin_6;
 	GPIO_Structure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_Structure);
 	
+	SPI_InitTypeDef SPI_Structure;
+	SPI_Structure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;//72M / 128
+	SPI_Structure.SPI_CPHA = SPI_CPHA_1Edge;
+	SPI_Structure.SPI_CPOL = SPI_CPOL_Low;
+	SPI_Structure.SPI_CRCPolynomial = 7;//默认值
+	SPI_Structure.SPI_DataSize = SPI_DataSize_8b;
+	SPI_Structure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+	SPI_Structure.SPI_FirstBit = SPI_FirstBit_MSB;
+	SPI_Structure.SPI_Mode = SPI_Mode_Master;
+	SPI_Structure.SPI_NSS = SPI_NSS_Soft;
+	SPI_Init(SPI1, &SPI_Structure);
+		
 	SPI_NSSInternalSoftwareConfig(SPI1,SPI_NSSInternalSoft_Set);
-
-	SPI_Cmd(SPI1,ENABLE);
+	GPIO_WriteBit(GPIOA,GPIO_Pin_4,Bit_SET);
 }
 
 void SPI1_SwapDate(uint8_t *pDataTx, uint8_t *pDataRx, uint16_t Size)
 {
-	
+	SPI_Cmd(SPI1,ENABLE);
+	SPI_I2S_SendData(SPI1,pDataTx[0]);
+	for(uint16_t i = 0;i<Size-1;i++)
+	{
+		while(SPI_I2S_GetFlagStatus(SPI1,SPI_I2S_FLAG_TXE) == RESET);
+		SPI_I2S_SendData(SPI1,pDataTx[i+1]);
+		while(SPI_I2S_GetFlagStatus(SPI1,SPI_I2S_FLAG_RXNE) == RESET);
+		pDataRx[i] = SPI_I2S_ReceiveData(SPI1);
+	}
+	while(SPI_I2S_GetFlagStatus(SPI1,SPI_I2S_FLAG_RXNE) == RESET);
+	pDataRx[Size-1] = SPI_I2S_ReceiveData(SPI1);
+	SPI_Cmd(SPI1,DISABLE);	
 }
 

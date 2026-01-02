@@ -2,30 +2,39 @@
 #include "Delay.h"
 #include "LED.h"
 #include "Key.h"
-#include "I2C1.h"
-
-uint8_t comd[]={0x00,0x8d,0x14,0xaf,0xa5};
-uint8_t buffer = 0;
-
+#include "W25Q64.h"
+uint8_t redaByte = 0;
 int main (void){
 
 	LED_Init();
 	Key_Init();
-	I2C1_RemapInit();
-	Delay_ms(100);
-	I2C1_SendByte(0x78,comd,5);
-	Delay_ms(100);
-	I2C1_ReceiveByte(0x78,&buffer,1);
-	if(((buffer>>6) & 0x01) == 0)
-	{
-		GPIO_WriteBit(GPIOC,GPIO_Pin_13,Bit_RESET);
-	}
-	else
-	{
-		GPIO_WriteBit(GPIOC,GPIO_Pin_13,Bit_SET);
-	}
+	SPI1_Init();
 	while(1)
 	{
+		if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_1)  == 0)
+		{
+			Delay_ms(10);
+			W25Q64_SaveByte(0x79);
+			
+		}
+		if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_11)  == 0)
+		{
+			Delay_ms(10);
+			W25Q64_SaveByte(0x78);
+		
+		}
+		
+		redaByte = W25Q64_ReadByte();
+		if(redaByte == 0x78)
+		{
+			GPIO_WriteBit(GPIOC,GPIO_Pin_13,Bit_RESET);
+
+		}
+		else if(redaByte == 0x79)
+		{
+			GPIO_WriteBit(GPIOC,GPIO_Pin_13,Bit_SET);
+		
+		}
 		
 	}
 }
