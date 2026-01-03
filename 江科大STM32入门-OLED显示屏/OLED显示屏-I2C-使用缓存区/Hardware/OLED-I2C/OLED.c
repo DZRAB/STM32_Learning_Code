@@ -48,11 +48,11 @@ void OLED_Init(void)
 void OLED_WriteCommand(uint8_t Command)
 {
 	SoftwareI2C_Start();
-	SoftwareI2C_SendByte(0x78); //Ñ°Ö·
+	SoftwareI2C_SendByte(0x78); //å¯»å€
 	SoftwareI2C_ReceiveACK();
-	SoftwareI2C_SendByte(0x00); //·¢ËÍControl Byte
+	SoftwareI2C_SendByte(0x00); //å‘é€Control Byte
 	SoftwareI2C_ReceiveACK();
-	SoftwareI2C_SendByte(Command); //·¢ËÍDate Byte
+	SoftwareI2C_SendByte(Command); //å‘é€Date Byte
 	SoftwareI2C_ReceiveACK();
 	SoftwareI2C_Stop();
 }
@@ -61,20 +61,20 @@ void OLED_WriteData(uint8_t *Data, uint8_t Count)
 {
 	uint8_t i;
 	SoftwareI2C_Start();
-	SoftwareI2C_SendByte(0x78); //Ñ°Ö·
+	SoftwareI2C_SendByte(0x78); //å¯»å€
 	SoftwareI2C_ReceiveACK();
-	SoftwareI2C_SendByte(0x40); //·¢ËÍControl Byte
+	SoftwareI2C_SendByte(0x40); //å‘é€Control Byte
 	SoftwareI2C_ReceiveACK();
 	for(i=0;i<Count;i++)
 	{
-		SoftwareI2C_SendByte(Data[i]); //·¢ËÍDate Byte
+		SoftwareI2C_SendByte(Data[i]); //å‘é€Date Byte
 		SoftwareI2C_ReceiveACK();
 	}
 	
 	SoftwareI2C_Stop();
 }
 
-//ÏÔÊ¾ÆğÊ¼×ø±ê
+//æ˜¾ç¤ºèµ·å§‹åæ ‡
 void OLED_SetCursor(uint8_t X, uint8_t Page)
 {
 	OLED_WriteCommand(0x00 | (X & 0x0F));
@@ -211,7 +211,7 @@ void OLED_ShowFloatNum(uint8_t X, uint8_t Y, double Number, uint8_t IntLength, u
 {
 	uint32_t IntNumber, FraNumber;
 	IntNumber = (uint32_t)Number;
-	FraNumber = (Number-IntNumber)*OLED_Pow(10,FraLength);//Ö±½Ó×ª»»Ğ¡Êı£¬Èç¹û½ØÈ¡ÏÔÊ¾£¬²»½øĞĞËÄÉáÎåÈë²Ù×÷
+	FraNumber = (Number-IntNumber)*OLED_Pow(10,FraLength);//ç›´æ¥è½¬æ¢å°æ•°ï¼Œå¦‚æœæˆªå–æ˜¾ç¤ºï¼Œä¸è¿›è¡Œå››èˆäº”å…¥æ“ä½œ
 	
 	OLED_ShowNum(X, Y, IntNumber, IntLength, FontSize);
 	OLED_ShowChar(X + IntLength*FontSize, Y, '.',FontSize);
@@ -259,7 +259,7 @@ void OLED_ShowImage(uint8_t X, uint8_t Y, uint8_t Width, uint8_t Height, const u
 {
 	OLED_ClearArea(X,Y,Width,Height);
 	uint8_t i,j;
-	//¸´ÔÓ£¬Éæ¼°ºÜ¶àËã·¨
+	//å¤æ‚ï¼Œæ¶‰åŠå¾ˆå¤šç®—æ³•
 	for(j=0;j<(Height-1)/8+1;j++)
 	{
 		for(i=0;i<Width;i++)
