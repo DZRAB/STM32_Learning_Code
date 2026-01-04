@@ -1,3 +1,26 @@
+/***************************************************************************************
+*PID算法入门，电机控速和电机角度
+
+*外设使用资源说明：
+*OLED模块：
+	使用模拟I2C，GPIO使用：PB8-SCL PB9-SDA
+*LED：
+	使用板载LED，GPIO使用：PC13
+*Key：
+	使用TIM1扫描按键，GPIO使用：KEY1:PB10 KEY2:PB11 KEY3:PA11 KEY4:PA12 
+*电位器RP：
+	使用ADC2通道2/3/4/5，GPIO使用：RP1:PA2 RP2:PA3 RP3:PA4 RP4:PA5
+*PWM：
+	使用TIM2的PWM功能，GPIO使用：PA0
+*Motor电机驱动：使用TB6612模块
+	PWMA使用TIM2, GPIO使用：AIN1:PB12 AIN2:PB13
+*Encode电机测速编码器：
+	使用TIM3输入捕获，GPIO使用：E1A:PA6 E1B:PA7
+*Serial串口输出：
+	使用USART1，GPIO使用：PA9:TXD PA10:RXD
+
+****************************************************************************************/
+
 #include "stm32f10x.h"
 #include "OLED.h"
 #include "LED.h"

@@ -9,7 +9,7 @@ void RP_Init(void)
 	//配置ADC时钟 72M/6 = 12M
 	RCC_ADCCLKConfig(RCC_PCLK2_Div6);
 	
-	//配置ADC1的通道1                 
+	//配置ADC2的通道1                 
 	GPIO_InitTypeDef GPIO_InitStructure; 
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN; //模拟输入
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5; 
