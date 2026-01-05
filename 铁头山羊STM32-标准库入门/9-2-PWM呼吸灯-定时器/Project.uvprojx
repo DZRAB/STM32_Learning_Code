@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\Delay;.\Hardware\OLED-0.96-4P-I2C;.\Hardware\LED;.\Hardware\Key;.\Hardware\Buzzer;.\Hardware\LightSensor;.\Hardware\CountSensor;.\Hardware\Encode;.\Basic\Timer;.\Hardware\PWM</IncludePath>
+              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\Delay;.\Hardware\LED;.\Basic</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -548,50 +548,20 @@
               <FileType>1</FileType>
               <FilePath>.\Basic\Delay\Delay.c</FilePath>
             </File>
+            <File>
+              <FileName>Timer1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Basic\Timer1.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Hardware</GroupName>
           <Files>
             <File>
-              <FileName>OLED.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\OLED-0.96-4P-I2C\OLED.c</FilePath>
-            </File>
-            <File>
               <FileName>LED.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Hardware\LED\LED.c</FilePath>
-            </File>
-            <File>
-              <FileName>Key.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\Key\Key.c</FilePath>
-            </File>
-            <File>
-              <FileName>Buzzer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\Buzzer\Buzzer.c</FilePath>
-            </File>
-            <File>
-              <FileName>LightSensor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\LightSensor\LightSensor.c</FilePath>
-            </File>
-            <File>
-              <FileName>CountSensor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\CountSensor\CountSensor.c</FilePath>
-            </File>
-            <File>
-              <FileName>Encode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\Encode\Encode.c</FilePath>
-            </File>
-            <File>
-              <FileName>PWM.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\PWM\PWM.c</FilePath>
             </File>
           </Files>
         </Group>

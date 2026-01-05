@@ -26,6 +26,7 @@ uint8_t i;
 
 int main (void)
 {
+	OLED_Init();
 	PWM_Init();
 	PWM_SetCompare1(0);
 	while(1)
