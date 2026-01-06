@@ -2,22 +2,27 @@
 #include "Delay.h"
 #include "LED.h"
 #include "Timer1.h"
+#include <math.h>
 int main (void){
 	
-	//LED_Init();
 	TIM1_Init();
-	
+	uint32_t time=100;
 	while(1){
 		
-//		for(uint8_t i = 0; i < 100 ;i++)
+		time++;
+		Delay_ms(1);
+		TIM_SetCompare1(TIM1,(uint16_t)(0.5*(sin(2*3.14*time)+1)*1000));
+		
+//		
+//		for(uint16_t i = 0; i < 1000 ;i++)
 //		{
 //			TIM_SetCompare1(TIM1,i);
-//			Delay_ms(10);
+//			Delay_ms(1);
 //		}
-//		for(uint8_t i = 0; i < 100 ;i++)
+//		for(uint16_t i = 0; i < 1000 ;i++)
 //		{
-//			TIM_SetCompare1(TIM1,100-i);
-//			Delay_ms(10);
+//			TIM_SetCompare1(TIM1,1000-i);
+//			Delay_ms(1);
 //		}
 
 	}

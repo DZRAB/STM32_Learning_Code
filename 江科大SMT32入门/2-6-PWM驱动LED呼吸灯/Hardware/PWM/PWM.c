@@ -54,6 +54,8 @@ void PWM_Init(void)
 	
 	//运行控制
 	TIM_Cmd(TIM2, ENABLE);
+	
+
 }
 
 void PWM_SetCompare1(uint16_t Compare)
