@@ -102,7 +102,7 @@ void TIM1_UP_IRQHandler(void)
 			Error1 = Error0;
 			Error0 = Target - Actual;
 			
-			if(fabs(Ki) > 0.0001)
+			if(fabs(Error0) < 50)
 				ErrorInt += Error0;
 			else
 				ErrorInt = 0;
