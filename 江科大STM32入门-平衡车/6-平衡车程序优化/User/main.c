@@ -15,22 +15,26 @@
 #include "PID.h"                  
 
 PID_t AnglePID = {
-	.Kp = 3,
+	.Kp = 5,
 	.Ki = 0.1,
-	.Kd = 2,
+	.Kd = 5,
 	
 	.OutMAX = 100,
 	.OutMIN = -100,
 	
+	.OutOffset = 3,
+	.ErrorIntMAX = 600,
+	.ErrorIntMIN = -600,
 };
 PID_t SpeedPID = {
 	.Kp = 2,
 	.Ki = 0.05,
 	.Kd = 0,
 	
-	.OutMAX = 20,
-	.OutMIN = -20,
-	
+	.OutMAX = 10,
+	.OutMIN = -10,
+	.ErrorIntMAX = 150,
+	.ErrorIntMIN = -150,
 };
 PID_t TurnPID = {
 	.Kp = 3,
@@ -39,7 +43,8 @@ PID_t TurnPID = {
 	
 	.OutMAX = 50,
 	.OutMIN = -50,
-	
+	.ErrorIntMAX = 20,
+	.ErrorIntMIN = -20,
 };
 
 int16_t AX,AY,AZ,GX,GY,GZ;
@@ -109,6 +114,7 @@ int main (void)
 		OLED_Printf(0,40,OLED_6X8,"A:%+05.1f",Angle);
 		OLED_Printf(0,48,OLED_6X8,"O:%+05.1f",AnglePID.Out);		
 		OLED_Printf(0,56,OLED_6X8,"GY:%+05d",GY);		
+		OLED_Printf(56,56,OLED_6X8,"Offset:%02.0f",AnglePID.OutOffset);		
 		OLED_Printf(50,0,OLED_6X8,"Speed",Angle);
 		OLED_Printf(50,8,OLED_6X8,"%05.2f",SpeedPID.Kp);
 		OLED_Printf(50,16,OLED_6X8,"%05.2f",SpeedPID.Ki);
@@ -173,6 +179,10 @@ int main (void)
 				else if(strcmp(Name, "TurnKd") == 0)
 				{
 					TurnPID.Kd = atof(Value);
+				}
+				else if(strcmp(Name, "Offset") == 0)
+				{
+					AnglePID.OutOffset = atof(Value);
 				}
 			}
 			else if (strcmp(Tag, "joystick") == 0)

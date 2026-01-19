@@ -8,7 +8,11 @@ typedef struct
 	float Error0, Error1, ErrorInt;//本次误差，上次误差，误差积分
 	
 	float OutMAX, OutMIN;
-
+	
+	float OutOffset;
+	float Actual1;
+	float ErrorIntMAX;
+	float ErrorIntMIN;
 } PID_t;
 
 void PID_Update(PID_t *p);
