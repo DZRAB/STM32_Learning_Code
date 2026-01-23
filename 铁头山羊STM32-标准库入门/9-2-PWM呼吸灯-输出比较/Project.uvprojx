@@ -190,7 +190,7 @@
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>1</useUlib>
+            <useUlib>0</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
@@ -314,7 +314,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>0</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -329,8 +329,8 @@
             <uC99>1</uC99>
             <uGnu>0</uGnu>
             <useXO>0</useXO>
-            <v6Lang>3</v6Lang>
-            <v6LangP>3</v6LangP>
+            <v6Lang>1</v6Lang>
+            <v6LangP>1</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
             <v6Lto>0</v6Lto>
@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\Delay;.\Hardware\LED;.\Hardware\Key;.\Basic\USART</IncludePath>
+              <IncludePath>.\CMSIS;.\Lib\inc;.\Lib\src;.\Startup;.\User;.\Basic\Delay;.\Hardware\LED;.\Basic</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -550,9 +550,9 @@
               <FilePath>.\Basic\Delay\Delay.c</FilePath>
             </File>
             <File>
-              <FileName>USART1.c</FileName>
+              <FileName>Timer1.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Basic\USART\USART1.c</FilePath>
+              <FilePath>.\Basic\Timer1.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -563,11 +563,6 @@
               <FileName>LED.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Hardware\LED\LED.c</FilePath>
-            </File>
-            <File>
-              <FileName>Key.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\Key\Key.c</FilePath>
             </File>
           </Files>
         </Group>
