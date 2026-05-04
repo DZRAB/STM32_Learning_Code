@@ -16,6 +16,7 @@
 #include "HC_SR04.h"
 
 uint32_t distance_mm;
+uint8_t ObstacleFlag = 0;   // 0=关闭避障, 1=开启避障
 
 PID_t AnglePID = {
 	.Kp = 5,
@@ -92,6 +93,10 @@ int main (void)
 			}
 			
 		}
+		if(KeyNum == 2)           // Key2 切换避障模式
+		{
+			ObstacleFlag = !ObstacleFlag;
+		}
 		
 		// 检查是否有新的测距结果
 		if(sr04_new_data)
@@ -113,26 +118,6 @@ int main (void)
 		if(RunFlag != 0)
 		{
 			LED1_ON();
-			if(KeyNum == 2)
-			{
-				if(distance_mm == 0)
-				{
-					SpeedPID.Target = 100.0;
-				}else if(distance_mm > 800 && distance_mm < 1300)
-				{
-					SpeedPID.Target = 60.0;
-				}else if(distance_mm > 300 && distance_mm < 800)
-				{
-					SpeedPID.Target = 20.0;
-				}else if(distance_mm > 150 && distance_mm < 300)
-				{
-					SpeedPID.Target = 20.0;
-					TurnPID.Target = 25.0;
-				}else if(distance_mm > 0 && distance_mm < 150)
-				{
-					SpeedPID.Target = 0;
-				}
-			}
 		}
 		else
 		{
@@ -156,8 +141,8 @@ int main (void)
 		OLED_Printf(0,40,OLED_6X8,"A:%+05.1f",Angle);
 		OLED_Printf(0,48,OLED_6X8,"O:%+05.1f",AnglePID.Out);		
 		OLED_Printf(0,56,OLED_6X8,"GY:%+05d",GY);		
-		//OLED_Printf(56,56,OLED_6X8,"Offset:%02.0f",AnglePID.OutOffset);	
-		OLED_Printf(56,56,OLED_6X8,"dis:%05dmm",distance_mm);		
+		OLED_Printf(60,56,OLED_6X8,"dis:%05dmm",distance_mm);		
+		OLED_Printf(48,48,OLED_6X8,"OB:%s",ObstacleFlag?"ON":"OFF");
 		
 		OLED_Printf(50,0,OLED_6X8,"Speed",Angle);
 		OLED_Printf(50,8,OLED_6X8,"%05.2f",SpeedPID.Kp);
@@ -242,6 +227,31 @@ int main (void)
 			BlueSerial_RxFlag = 0;
 		}
 		//BlueSerial_Printf("[plot,%f,%f]",TurnPID.Target,DifSpeed);  
+
+		/* ========= 避障逻辑（放在遥控命令之后，优先级高于遥控） ========= */
+		/* 注意：Target 单位为 转/秒，遥控器最大为 ±100/25.0 = ±4 转/秒 */
+		if(RunFlag != 0 && ObstacleFlag != 0 && distance_mm > 0)
+		{
+			if(distance_mm > 800 && distance_mm <= 1300)     // 800~1300mm: 减速接近
+			{
+				SpeedPID.Target = 3.0f;   // 相当于 LV≈75
+			}
+			else if(distance_mm > 300 && distance_mm <= 800) // 300~800mm: 慢速接近
+			{
+				SpeedPID.Target = 1.5f;   // 相当于 LV≈37.5
+			}
+			else if(distance_mm > 150 && distance_mm <= 300) // 150~300mm: 慢速+转弯避让
+			{
+				SpeedPID.Target = 1.0f;   // 相当于 LV≈25
+				TurnPID.Target = 2.0f;    // 相当于 RH≈50，轻度转向
+			}
+			else if(distance_mm > 0 && distance_mm <= 150)   // 0~150mm: 急停
+			{
+				SpeedPID.Target = 0;
+				TurnPID.Target = 0;
+			}
+		}
+		// distance_mm == 0（无障碍物/超出量程）：不干预，保持遥控或默认目标
 
 	}
 }
@@ -364,7 +374,7 @@ void TIM1_CC_IRQHandler(void)
         rise_overflow = sr04_overflow_cnt;
         // 将通道4的捕获极性改为下降沿，这样下次捕获会在 ECHO 变低时触发
         TIM_OC4PolarityConfig(TIM1, TIM_ICPolarity_Falling);
-        step = 1;   // 状态切换到“等待下降沿”
+        step = 1;   // 状态切换到"等待下降沿"
     }
     else            // ---------- 当前状态：等待下降沿 ----------
     {
@@ -402,12 +412,12 @@ void TIM1_CC_IRQHandler(void)
 
         // 将计算出的宽度（微秒）存入全局变量，供主循环使用
         sr04_width_us = width;
-        // 置位“新数据”标志，通知主循环已经测完一次
+        // 置位"新数据"标志，通知主循环已经测完一次
         sr04_new_data = 1;
 
         // 将捕获极性改回上升沿，准备下一次测距
         TIM_OC4PolarityConfig(TIM1, TIM_ICPolarity_Rising);
-        step = 0;   // 状态回到“等待上升沿”
+        step = 0;   // 状态回到"等待上升沿"
     }
 }
 
