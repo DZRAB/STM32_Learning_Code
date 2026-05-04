@@ -67,7 +67,9 @@ int main(void)
 
   /* USER CODE BEGIN 1 */
 
-
+		HAL_Delay(300);
+	
+		HAL_Delay(300);
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
