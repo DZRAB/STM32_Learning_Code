@@ -225,8 +225,8 @@ static void Display_Result(void)
         OLED_ShowString(2, 1, "F:");
         OLED_ShowChar(2, 5, '.');
         OLED_ShowString(2, 10, "kHz");               /* 行2: F:xx.xxx kHz */
-        OLED_ShowString(3, 4, "Err:");
-        OLED_ShowString(3, 14, "ppm");               /* 行3: Err:±xxxx ppm */
+        OLED_ShowString(3, 1, "Err:");
+        OLED_ShowString(3, 11, "ppm");               /* 行3: Err:±xxxx ppm */
         OLED_ShowChar(4, 1, 'T');
         OLED_ShowChar(4, 2, ':');
         OLED_ShowString(4, 11, "#");                  /* 行4: T:ddddddd #NN */
@@ -241,11 +241,11 @@ static void Display_Result(void)
 
     /* ppm误差: 有符号5位数 */
     if (g_ppm >= 0)
-        OLED_ShowSignedNum(3, 8, g_ppm, 5);
+        OLED_ShowSignedNum(3, 5, g_ppm, 5);
     else
     {
-        OLED_ShowChar(3, 8, '-');
-        OLED_ShowNum(3, 9, (uint32_t)(-g_ppm), 4);
+        OLED_ShowChar(3, 5, '-');
+        OLED_ShowNum(3, 6, (uint32_t)(-g_ppm), 4);
     }
 
     /* TIM2 tick差值 + 测量序号 */
