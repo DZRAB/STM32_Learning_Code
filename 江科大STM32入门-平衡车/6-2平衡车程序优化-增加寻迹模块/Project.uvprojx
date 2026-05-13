@@ -619,9 +619,9 @@
               <FilePath>.\Hardware\BlueSerial.c</FilePath>
             </File>
             <File>
-              <FileName>HC_SR04.c</FileName>
+              <FileName>Track.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Hardware\HC_SR04.c</FilePath>
+              <FilePath>.\Hardware\Track.c</FilePath>
             </File>
           </Files>
         </Group>
