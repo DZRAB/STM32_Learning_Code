@@ -15,14 +15,14 @@
 #include "PID.h"                  
 
 PID_t AnglePID = {
-	.Kp = 5,
-	.Ki = 0.1,
-	.Kd = 5,
+	.Kp = 4,
+	.Ki = 0.05,
+	.Kd = 3,
 	
 	.OutMAX = 100,
 	.OutMIN = -100,
 	
-	.OutOffset = 3,
+	.OutOffset = 1,
 	.ErrorIntMAX = 600,
 	.ErrorIntMIN = -600,
 };
@@ -37,12 +37,13 @@ PID_t SpeedPID = {
 	.ErrorIntMIN = -150,
 };
 PID_t TurnPID = {
-	.Kp = 3,
-	.Ki = 3,
-	.Kd = 0,
+	.Kp = 5,
+	.Ki = 0,
+	.Kd = 2.5,
 	
 	.OutMAX = 50,
 	.OutMIN = -50,
+	
 	.ErrorIntMAX = 20,
 	.ErrorIntMIN = -20,
 };
@@ -57,9 +58,13 @@ float Angle;
 
 uint8_t KeyNum, RunFlag;
 uint8_t TrackFlag = 0;              /* 寻迹模式标志：1=开启，0=关闭                    */
-float TrackSpeed = 2.0f;            /* 寻迹前进速度目标值(m/s)，Track_GetPosition返回  */
-                                    /* 的位置乘以 TrackKp 后作为 TurnPID 的转向目标     */
-float TrackKp = 2.5f;               /* 寻迹转向比例系数                                */
+float TrackSpeed = 1.2f;            /* 循迹前进速度目标值                                   */
+float TrackKp = 0.15f;               /* 寻迹转向比例系数                                   */
+#define CONF_TRACK_KP_CORNER_BOOST 2.0f   /* 弯道增强倍数（12~30mm线性过渡）          */
+#define CONF_TRACK_DEAD_ZONE_MM 3.0f      /* 死区(mm)：|pos|小于此值时不做修正        */
+float TrackLastPos = 0.0f;          /* 上次检测到的黑线位置，脱线时用于转向找回          */
+float TrackPosMemory = 0.0f;        /* 方向记忆：记录最近一次偏离中心的位置方向         */
+uint16_t TrackLostCount = 0;        /* 脱线持续计数                                      */
                                     /*                                                      */
                                     /* 控制关系：                                        */
                                     /*   pos = Track_GetPosition();   // 单位：mm        */
@@ -119,6 +124,7 @@ int main (void)
 				}
 			}
 		}
+		/* K3 未使用，保留备用 */
 		if(RunFlag != 0)
 		{
 			LED1_ON();
@@ -163,7 +169,14 @@ int main (void)
 		/* 寻迹状态显示 */
 		if (TrackFlag)
 		{
-			OLED_Printf(72,56,OLED_6X8,"TRK:ON");
+			OLED_Printf(72,56,OLED_6X8,"TRK:ON ");
+			uint16_t trackBits = Track_Get();
+			OLED_Printf(82,56,OLED_6X8,"%c%c%c%c%c",
+				(trackBits & 0x01) ? '1' : '0',
+				(trackBits & 0x02) ? '1' : '0',
+				(trackBits & 0x04) ? '1' : '0',
+				(trackBits & 0x08) ? '1' : '0',
+				(trackBits & 0x10) ? '1' : '0');
 		}
 		else
 		{
@@ -301,73 +314,58 @@ void TIM1_UP_IRQHandler(void)
 			if(RunFlag != 0)
 			{
 				/*
-				 * ── 寻迹模式控制逻辑 ──
-				 *
-				 * 控制架构（与摇杆共用同一套PID，只是目标值来源不同）：
-				 *
-				 *   外部输入               Speed/Turn PID           Angle PID
-				 *   ┌───────┐            ┌──────────────────┐    ┌────────────┐
-				 *   │ 摇杆  │──LV→       │ SpeedPID         │    │ AnglePID   │
-				 *   │ 寻迹  │──pos×Kp→   │ Target → Out     │───→│ Target     │
-				 *   └───────┘            │                  │    │  → P(平衡) │──→ AvePWM
-				 *                        │ TurnPID          │    └────────────┘
-				 *                        │ Target → Out     │──→ DifPWM
-				 *                        └──────────────────┘
-				 *
-				 * 速度环(SpeedPID)每50ms运行一次，角度环(AnglePID)每10ms运行一次。
-				 * 当 TrackFlag=1 时，寻迹模块覆盖摇杆输入，设置：
-				 *   SpeedPID.Target = TrackSpeed           // 固定前进速度
-				 *   TurnPID.Target  = pos * TrackKp        // 基于位置偏差的转向
-				 *
-				 * 这种"串级+P"控制架构的好处：
-				 *   - 寻迹不修改底层平衡控制，安全
-				 *   - 可以和摇杆控制共用同一PID环路
-				 *   - 在线切换无冲击（因为PID_Init重置了积分项）
+				 * 同步刷新：在PID更新前读取传感器，
+				 * 确保 TurnPID 看到最新 Target。
+				 * 10ms通道的Target更新在这之后也会继续运行，
+				 * 为下一周期提前准备目标值。
 				 */
 				if (TrackFlag)
 				{
-					/*
-					 * Track_GetPosition() 返回传感器检测到的黑线位置：
-					 *   - 正常范围：-46.5mm ~ +46.5mm（相对于车体中线）
-					 *   - 负值=线在左侧，正值=线在右侧
-					 *   - 脱线时返回 999.0f
-					 *
-					 * 控制策略：
-					 *   有黑线：根据偏移量计算转向，保持固定前进速度
-					 *   脱  线：降速至30%缓慢前进，尝试重新找回黑线
-					 */
 					float pos = Track_GetPosition();
-					if (pos < 100.0f)           // 检测到黑线 (正常范围 ±46.5)
+					if (pos < 100.0f)
 					{
-						/*
-						 * TurnPID.Target = pos × TrackKp
-						 * 将黑线偏移量(mm)转换为转向PID的目标值。
-						 *
-						 * 符号约定：
-						 *   pos > 0 (线偏右) → TurnPID.Target > 0
-						 *   → DifPWM > 0 → LeftPWM增加, RightPWM减小
-						 *   → 小车右转 → 纠正偏右 → 线回到中间
-						 *
-						 *   pos < 0 (线偏左) → 左转 → 同理纠正
-						 */
-						SpeedPID.Target = TrackSpeed;           // 恒速前进
-						TurnPID.Target  = pos * TrackKp;        // 转向控制
+						if (pos > -CONF_TRACK_DEAD_ZONE_MM && pos < CONF_TRACK_DEAD_ZONE_MM)
+							pos = TrackPosMemory * 0.5f;
+						else
+							TrackPosMemory = pos;
+
+						float kp = TrackKp;
+						float absPos = (pos > 0) ? pos : -pos;
+						if (absPos > 12.0f)
+						{
+							float t = (absPos - 12.0f) / 18.0f;
+							if (t > 1.0f) t = 1.0f;
+							kp = TrackKp * (1.0f + t * (CONF_TRACK_KP_CORNER_BOOST - 1.0f));
+						}
+
+						SpeedPID.Target = TrackSpeed;
+						TurnPID.Target  = pos * kp;
+						TrackLastPos = pos;
+						TrackLostCount = 0;
 					}
-					else                        // 脱线：≈ 传感器离地或线消失
+					else
 					{
-						/*
-						 * 脱线处理：
-						 * 降速到30%并保持最后转向方向（PID积分保持），
-						 * 让车子缓慢前进并可能自行找回黑线。
-						 *
-						 * 如果持续脱线超过一定时间（可后续增加超时计数器），
-						 * 可以考虑停止运行或原地旋转搜索。
-						 */
-						SpeedPID.Target = TrackSpeed * 0.3f;
-						/* TurnPID.Target保持上次值（由PID积分维持） */
+						TrackLostCount++;
+						SpeedPID.Target = TrackSpeed * 0.5f;
+
+						if (TrackLostCount < 40)
+						{
+							if (!(TrackLastPos > -30.0f && TrackLastPos < 30.0f))
+								TurnPID.Target = (TrackLastPos > 0) ? 3.0f : -3.0f;
+						}
+						else if (TrackLostCount < 150)
+						{
+							SpeedPID.Target = TrackSpeed * 0.3f;
+							TurnPID.Target = ((TrackLostCount / 30) % 2 == 0) ? 4.0f : -4.0f;
+						}
+						else
+						{
+							SpeedPID.Target = 0;
+							TurnPID.Target = ((TrackLostCount / 60) % 2 == 0) ? 5.0f : -5.0f;
+						}
 					}
 				}
-				
+
 				SpeedPID.Actual = AveSpeed;
 				PID_Update(&SpeedPID);
 				AnglePID.Target = SpeedPID.Out;
@@ -394,6 +392,67 @@ void TIM1_UP_IRQHandler(void)
 			{
 				RunFlag = 0;
 			}	
+			/*
+			 * ── 快速循迹通道（10ms=100Hz）──
+			 * 传感器读数、目标值计算放在高速通道；
+			 * PID 更新(50ms)用最新目标值运行。
+			 * 响应比之前(50ms→10ms)快5倍，
+			 * 且速度测量仍保留50ms稳定不抖。
+			 */
+			if (TrackFlag && RunFlag != 0)
+			{
+				float pos = Track_GetPosition();
+				if (pos < 100.0f)
+				{
+					/*
+					 * ── 方向记忆死区 ──
+					 * 仅S3检测到黑线(±3mm内)有两种可能：
+					 *   ① 完全居中正对 → 直行 ✓
+					 *   ② 车体歪斜但黑线恰好还在S3下 → 需纠正
+					 * 用 TrackPosMemory 记住上次偏离的方向，
+					 * 死区内按记忆方向衰减修正，避免歪着走。
+					 */
+					if (pos > -CONF_TRACK_DEAD_ZONE_MM && pos < CONF_TRACK_DEAD_ZONE_MM)
+						pos = TrackPosMemory * 0.5f;
+					else
+						TrackPosMemory = pos;
+
+					float kp = TrackKp;
+					float absPos = (pos > 0) ? pos : -pos;
+					if (absPos > 12.0f)
+					{
+						float t = (absPos - 12.0f) / 18.0f;
+						if (t > 1.0f) t = 1.0f;
+						kp = TrackKp * (1.0f + t * (CONF_TRACK_KP_CORNER_BOOST - 1.0f));
+					}
+
+					SpeedPID.Target = TrackSpeed;
+					TurnPID.Target  = pos * kp;
+					TrackLastPos = pos;
+					TrackLostCount = 0;
+				}
+				else
+				{
+					TrackLostCount++;
+					SpeedPID.Target = TrackSpeed * 0.5f;
+
+					if (TrackLostCount < 40)                     // Phase 1: ~0.4s
+					{
+						if (TrackLastPos > -30.0f && TrackLastPos < 30.0f) { }
+						else { TurnPID.Target = (TrackLastPos > 0) ? 3.0f : -3.0f; }
+					}
+					else if (TrackLostCount < 150)                // Phase 2: ~1.5s
+					{
+						SpeedPID.Target = TrackSpeed * 0.3f;
+						TurnPID.Target = ((TrackLostCount / 30) % 2 == 0) ? 4.0f : -4.0f;
+					}
+					else                                          // Phase 3: 原地自旋
+					{
+						SpeedPID.Target = 0;
+						TurnPID.Target = ((TrackLostCount / 60) % 2 == 0) ? 5.0f : -5.0f;
+					}
+				}
+			}
 			if(RunFlag != 0)
 			{
 				AnglePID.Actual = Angle;
