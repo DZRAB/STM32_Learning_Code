@@ -78,6 +78,8 @@ float AngleGyro;
 float Angle;
 
 uint8_t KeyNum, RunFlag;
+int16_t LeftPWM=0, RightPWM=0;
+int16_t AvePWM=0, DifPWM=0;//平均PWM和差分PWM
 
 /* ── 循迹相关变量 ─────────────────────────────────────────────*/
 
@@ -98,8 +100,6 @@ uint16_t TrackLostCount = 0;        /* 脱线持续计数                  */
  */
 /*──────────────────────────────────────────────────────────────────*/
 
-int16_t LeftPWM=0, RightPWM=0;
-int16_t AvePWM=0, DifPWM=0;//平均PWM和差分PWM
 
 int main (void)
 {
@@ -150,7 +150,6 @@ int main (void)
 				}
 			}
 		}
-		/* K3 未使用，保留备用 */
 		if(RunFlag != 0)
 		{
 			LED1_ON();
@@ -229,22 +228,6 @@ int main (void)
 				else if(strcmp(Name, "TrackKp") == 0)  { TrackKp = atof(Value); }
 				else if(strcmp(Name, "TrackSpeed") == 0){ TrackSpeed = atof(Value); }
 			}
-			else if (strcmp(Tag, "track") == 0)
-			{
-				uint8_t cmd = atoi(strtok(NULL, ","));
-				if (cmd == 1)
-				{
-					TrackFlag = 1;
-					PID_Init(&AnglePID);
-					PID_Init(&SpeedPID);
-					PID_Init(&TurnPID);
-					RunFlag = 1;
-				}
-				else
-				{
-					TrackFlag = 0;
-				}
-			}
 			else if (strcmp(Tag, "joystick") == 0)
 			{
 				int8_t LH = atoi(strtok(NULL, ","));
@@ -259,7 +242,7 @@ int main (void)
 			}
 			BlueSerial_RxFlag = 0;
 		}
-		BlueSerial_Printf("[plot,%f,%f]",TurnPID.Target,DifSpeed);  
+		// BlueSerial_Printf("[plot,%f,%f]",TurnPID.Target,DifSpeed);  
 	}
 }
 
@@ -409,3 +392,4 @@ void TIM1_UP_IRQHandler(void)
 		TIM_ClearITPendingBit(TIM1,TIM_IT_Update);
 	}
 }
+

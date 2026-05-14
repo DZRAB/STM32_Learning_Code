@@ -3,14 +3,16 @@
         {
             "name": "Project_Target 1",
             "includePath": [
-                "e:\\GitHubRepositories\\STM32_Learning_Code\\江科大STM32入门-平衡车\\6-2平衡车程序优化-增加寻迹模块\\CMSIS",
-                "e:\\GitHubRepositories\\STM32_Learning_Code\\江科大STM32入门-平衡车\\6-2平衡车程序优化-增加寻迹模块\\Lib\\inc",
-                "e:\\GitHubRepositories\\STM32_Learning_Code\\江科大STM32入门-平衡车\\6-2平衡车程序优化-增加寻迹模块\\Lib\\src",
-                "e:\\GitHubRepositories\\STM32_Learning_Code\\江科大STM32入门-平衡车\\6-2平衡车程序优化-增加寻迹模块\\Startup",
-                "e:\\GitHubRepositories\\STM32_Learning_Code\\江科大STM32入门-平衡车\\6-2平衡车程序优化-增加寻迹模块\\User",
-                "e:\\GitHubRepositories\\STM32_Learning_Code\\江科大STM32入门-平衡车\\6-2平衡车程序优化-增加寻迹模块\\Basic\\Delay",
-                "e:\\GitHubRepositories\\STM32_Learning_Code\\江科大STM32入门-平衡车\\6-2平衡车程序优化-增加寻迹模块\\Hardware",
-                "e:\\GitHubRepositories\\STM32_Learning_Code\\江科大STM32入门-平衡车\\6-2平衡车程序优化-增加寻迹模块\\Basic",
+                "f:\\GitHubRepository\\STM32_Learning_Code\\江科大STM32入门-平衡车\\6-2平衡车程序优化-增加寻迹模块\\CMSIS",
+                "f:\\GitHubRepository\\STM32_Learning_Code\\江科大STM32入门-平衡车\\6-2平衡车程序优化-增加寻迹模块\\Lib\\inc",
+                "f:\\GitHubRepository\\STM32_Learning_Code\\江科大STM32入门-平衡车\\6-2平衡车程序优化-增加寻迹模块\\Lib\\src",
+                "f:\\GitHubRepository\\STM32_Learning_Code\\江科大STM32入门-平衡车\\6-2平衡车程序优化-增加寻迹模块\\Startup",
+                "f:\\GitHubRepository\\STM32_Learning_Code\\江科大STM32入门-平衡车\\6-2平衡车程序优化-增加寻迹模块\\User",
+                "f:\\GitHubRepository\\STM32_Learning_Code\\江科大STM32入门-平衡车\\6-2平衡车程序优化-增加寻迹模块\\Basic\\Delay",
+                "f:\\GitHubRepository\\STM32_Learning_Code\\江科大STM32入门-平衡车\\6-2平衡车程序优化-增加寻迹模块\\Hardware",
+                "f:\\GitHubRepository\\STM32_Learning_Code\\江科大STM32入门-平衡车\\6-2平衡车程序优化-增加寻迹模块\\Basic",
+                "D:\\Keil_v5\\ARM\\ARMCC\\include",
+                "D:\\Keil_v5\\ARM\\ARMCC\\include\\rw",
                 "${default}"
             ],
             "defines": [
