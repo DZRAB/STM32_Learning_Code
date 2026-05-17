@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /* 四路巡线模块引脚定义
- * TCRT5000四路寻迹模块接线（低电平检测到黑线）：
+ * TCRT5000四路寻迹模块接线（高电平检测到黑线，经LM393比较器整形输出）：
  *   S1 -> PC14 (原低频晶振引脚，因未使用32.768kHz晶振，已配置为GPIO)
  *   S2 -> PA9  (原USART1_TX，放弃串口调试功能，配置为GPIO)
  *   S3 -> PA10 (原USART1_RX，放弃串口调试功能，配置为GPIO)
@@ -35,6 +35,7 @@
 /* 函数声明 */
 void Track_Init(void);                 // 四路巡线模块初始化
 void Track_Update(void);               // 读取传感器并计算位置误差
+void Track_ResetState(void);           // 复位循迹状态（K2开启循迹时调用）
 uint8_t Track_GetSensorRaw(void);      // 获取原始传感器数据
 float Track_GetError(void);            // 获取计算后的位置误差
 void Track_SetSpeed(float Speed);      // 设置循迹速度

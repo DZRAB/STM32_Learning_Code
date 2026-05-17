@@ -58,8 +58,10 @@ float Angle;
 
 uint8_t KeyNum, RunFlag;
 uint8_t TrackFlag = 0;              /* 寻迹模式标志：1=开启，0=关闭                    */
-float TrackSpeed = 1.2f;            /* 循迹前进速度目标值                                   */
-float TrackKp = 0.2f;               /* 寻迹转向比例系数                                */
+float TrackSpeed = 0.8f;            /* 循迹前进速度目标值                                   */
+float TrackKp = 0.3f;               /* 寻迹转向比例系数                                   */
+float TrackLastPos = 0.0f;          /* 上次有效位置，盲区找回用                          */
+uint8_t TrackLostCount = 0;         /* 失线持续次数                                      */
                                     /*                                                      */
                                     /* 控制关系：                                        */
                                     /*   pos = Track_GetPosition();   // 单位：mm        */
@@ -160,14 +162,20 @@ int main (void)
 		OLED_Printf(88,32,OLED_6X8,"%+05.1f",TurnPID.Target);
 		OLED_Printf(88,40,OLED_6X8,"%+05.1f",Angle);
 		OLED_Printf(88,48,OLED_6X8,"%+05.1f",TurnPID.Out);
-		/* 寻迹状态显示 */
+		/* 寻迹状态 + 传感器显示 */
 		if (TrackFlag)
 		{
 			OLED_Printf(72,56,OLED_6X8,"TRK:ON");
+			uint16_t tb = Track_Get();
+			OLED_Printf(90,56,OLED_6X8,"%c%c%c%c",
+				(tb & 0x08) ? '1' : '0',  /* S4 */
+				(tb & 0x04) ? '1' : '0',  /* S3 */
+				(tb & 0x02) ? '1' : '0',  /* S2 */
+				(tb & 0x01) ? '1' : '0'); /* S1 */
 		}
 		else
 		{
-			OLED_Printf(72,56,OLED_6X8,"TRK:OFF");
+			OLED_Printf(72,56,OLED_6X8,"TRK:OFF  ");
 		}
 		OLED_Update();
 		
@@ -230,10 +238,11 @@ int main (void)
 
 void TIM1_UP_IRQHandler(void)
 {
-	static uint8_t Count,AngleCount;
+	static uint8_t Count, SnsCount, AngleCount;
 	float Alpha = 0;
 	if(TIM_GetITStatus(TIM1,TIM_IT_Update) == SET)
 	{
+		/* ── 50ms低速通道：编码器读数 + PID更新 ── */
 		Count++;
 		if(Count >= 50)
 		{
@@ -246,17 +255,30 @@ void TIM1_UP_IRQHandler(void)
 			
 			if(RunFlag != 0)
 			{
+				/* PID更新前读传感器，保证Target新鲜 */
 				if (TrackFlag)
 				{
 					float pos = Track_GetPosition();
-					if (pos < 100.0f)
-					{
+					if (pos < 100.0f) {
 						SpeedPID.Target = TrackSpeed;
-						TurnPID.Target  = pos * TrackKp;
-					}
-					else
-					{
-						SpeedPID.Target = TrackSpeed * 0.3f;
+						float target = pos * TrackKp;
+						if (target > -2.4f && target < 2.4f) target *= 0.5f;
+						TurnPID.Target = target;
+						uint16_t bits = Track_Get();
+						if ((bits & 0x01) && !(bits & 0x02)) TurnPID.Target -= 2.0f;
+						if ((bits & 0x08) && !(bits & 0x04)) TurnPID.Target += 2.0f;
+						TrackLastPos = pos;
+						TrackLostCount = 0;
+					} else {
+						TrackLostCount++;
+						/* 盲区找线：根据最后位置向对应方向轻转找回 */
+						if (TrackLostCount < 10) {
+							SpeedPID.Target = TrackSpeed;
+							if (TrackLastPos < 0) TurnPID.Target = -2.0f;
+							else                  TurnPID.Target =  2.0f;
+						} else {
+							SpeedPID.Target = TrackSpeed * 0.3f;
+						}
 					}
 				}
 				
@@ -268,8 +290,35 @@ void TIM1_UP_IRQHandler(void)
 				PID_Update(&TurnPID);
 				DifPWM = TurnPID.Out;
 			}
-
 		}
+
+		/* ── 25ms中速通道：传感器提前刷新Target ── */
+		SnsCount++;
+		if(SnsCount >= 25 && RunFlag != 0 && TrackFlag)
+		{
+			SnsCount = 0;
+			float pos = Track_GetPosition();
+			if (pos < 100.0f) {
+				SpeedPID.Target = TrackSpeed;
+				float target = pos * TrackKp;
+				if (target > -2.4f && target < 2.4f) target *= 0.5f;
+				TurnPID.Target = target;
+				uint16_t bits = Track_Get();
+				if ((bits & 0x01) && !(bits & 0x02)) TurnPID.Target -= 2.0f;
+				if ((bits & 0x08) && !(bits & 0x04)) TurnPID.Target += 2.0f;
+				TrackLastPos = pos;
+				TrackLostCount = 0;
+			} else {
+				TrackLostCount++;
+				if (TrackLostCount < 10) {
+					SpeedPID.Target = TrackSpeed;
+					if (TrackLastPos < 0) TurnPID.Target = -2.0f;
+					else                  TurnPID.Target =  2.0f;
+				}
+			}
+		}
+
+		/* ── 10ms高速通道：MPU6050 + 角度PID ── */
 		AngleCount++;
 		if(AngleCount >= 10)
 		{
